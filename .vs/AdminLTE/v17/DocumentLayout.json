@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\Internship\\AdminLTE\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Internship\\AdminLTE\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -31,19 +35,32 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": ".gitignore",
+              "DocumentMoniker": "D:\\Internship\\AdminLTE\\.gitignore",
+              "RelativeDocumentMoniker": ".gitignore",
+              "ToolTip": "D:\\Internship\\AdminLTE\\.gitignore",
+              "RelativeToolTip": ".gitignore",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-06-17T05:53:25.895Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "_Layout.cshtml",
               "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Shared\\_Layout.cshtml",
               "RelativeDocumentMoniker": "AdminLTE\\Views\\Shared\\_Layout.cshtml",
               "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Shared\\_Layout.cshtml",
               "RelativeToolTip": "AdminLTE\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAACMAAAAAZmZmZmYawC4AAABCAAAAAAAAAA==",
+              "ViewState": "AgIAACMAAAAAZmZmZmYawDIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-06-16T14:48:23.483Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "_ViewStart.cshtml",
               "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Areas\\Identity\\Pages\\_ViewStart.cshtml",
               "RelativeDocumentMoniker": "AdminLTE\\Areas\\Identity\\Pages\\_ViewStart.cshtml",
