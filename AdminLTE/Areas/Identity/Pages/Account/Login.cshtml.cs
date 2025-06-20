@@ -20,11 +20,13 @@ namespace AdminLTE.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager; // 👈 Add this
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ILogger<LoginModel> logger)
         {
             _signInManager = signInManager;
+            _userManager = userManager; // 👈 Assign here
             _logger = logger;
         }
 
@@ -85,33 +87,60 @@ namespace AdminLTE.Areas.Identity.Pages.Account
         }
 
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
-            ReturnUrl = returnUrl ?? Url.Content("~/Home/Index"); // ✅ fallback if null
+            // ✅ Prevent browser from caching the login page
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+
+            // ✅ Avoid redirect loop
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home"); // go to Home/Index
+            }
+
+            ReturnUrl = returnUrl ?? Url.Content("~/Home/Index");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            return Page(); // render login
         }
+
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/Home/Index"); // ✅ fallback again
+            returnUrl ??= Url.Content("~/Home/Index");
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
+                // 👇 First, find the user by email
+                var user = await _userManager.FindByEmailAsync(Input.Email);
+                if (user != null)
                 {
-                    Console.WriteLine("✅ Login success. Redirecting to: " + returnUrl);
-                    return LocalRedirect(returnUrl); // ✅ correct redirect
+                    // 👇 Use username to sign in
+                    var result = await _signInManager.PasswordSignInAsync(user.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
+                    if (result.Succeeded)
+                    {
+                        HttpContext.Session.SetString("UserName", user.UserName);
+                        _logger.LogInformation("User logged in.");
+                        return LocalRedirect(returnUrl);
+                    }
+
+                    if (result.IsLockedOut)
+                    {
+                        ModelState.AddModelError(string.Empty, "Account locked out.");
+                        return Page();
+                    }
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
+
+                // If user not found or password wrong
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
 
             // Something failed
             return Page();
         }
+
     }
 }

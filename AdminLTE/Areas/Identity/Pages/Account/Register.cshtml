@@ -2,9 +2,8 @@
 @model RegisterModel
 @{
     ViewData["Title"] = "Register";
-    Layout = null; // Optional: use AdminLTE without site layout
+    Layout = null; // No _Layout used
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,8 +30,19 @@
                 <p class="login-box-msg">Register a new membership</p>
 
                 <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
+                    <!-- Full Name -->
+                    <div class="input-group mb-3">
+                        <input asp-for="Input.UserName" class="form-control" placeholder="User name" />
+                        <div class="input-group-append">
+                            <div class="input-group-text"><span class="fas fa-user"></span></div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.UserName" class="text-danger"></span>
+
+                    <!-- Email -->
                     <div class="input-group mb-3">
                         <input asp-for="Input.Email" class="form-control" placeholder="Email">
                         <div class="input-group-append">
@@ -41,6 +51,7 @@
                     </div>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
 
+                    <!-- Password -->
                     <div class="input-group mb-3">
                         <input asp-for="Input.Password" class="form-control" placeholder="Password">
                         <div class="input-group-append">
@@ -49,6 +60,7 @@
                     </div>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
 
+                    <!-- Confirm Password -->
                     <div class="input-group mb-3">
                         <input asp-for="Input.ConfirmPassword" class="form-control" placeholder="Retype password">
                         <div class="input-group-append">
@@ -57,13 +69,12 @@
                     </div>
                     <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
 
+                    <!-- Terms & Register Button -->
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
                                 <input type="checkbox" id="agreeTerms" name="terms" value="agree">
-                                <label for="agreeTerms">
-                                    I agree to the <a href="#">terms</a>
-                                </label>
+                                <label for="agreeTerms">I agree to the <a href="#">terms</a></label>
                             </div>
                         </div>
                         <div class="col-4">
@@ -72,11 +83,12 @@
                     </div>
                 </form>
 
-                <div class="social-auth-links text-center">
-                    @if ((Model.ExternalLogins?.Count ?? 0) > 0)
-                    {
+                <!-- External Login Buttons -->
+                @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                {
+                    <div class="social-auth-links text-center mt-2">
                         <form asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                            @foreach (var provider in Model.ExternalLogins!)
+                            @foreach (var provider in Model.ExternalLogins)
                             {
                                 <button type="submit" class="btn btn-block btn-outline-primary mb-2" name="provider" value="@provider.Name">
                                     <i class="fab fa-@provider.DisplayName.ToLowerInvariant() mr-2"></i>
@@ -84,8 +96,10 @@
                                 </button>
                             }
                         </form>
-                    }
-                </div>
+                    </div>
+                }
+
+                <!-- Demo Social Icons -->
                 <div class="social-auth-links text-center">
                     <a href="#" class="btn btn-block btn-primary">
                         <i class="fab fa-facebook mr-2"></i>
@@ -99,16 +113,22 @@
 
                 <a asp-page="/Account/Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-center">I already have a membership</a>
             </div>
-            <!-- /.form-box -->
-        </div><!-- /.card -->
+        </div>
     </div>
 
-           <!-- Scripts -->
+    <!-- Scripts -->
     <script src="~/plugins/jquery/jquery.min.js"></script>
     <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/dist/js/adminlte.min.js"></script>
-    @section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-    }
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        if (window.history && window.history.pushState) {
+            window.history.pushState(null, "", window.location.href);
+            window.onpopstate = function () {
+                window.history.pushState(null, "", window.location.href);
+            };
+        }
+    </script>
+
 </body>
 </html>

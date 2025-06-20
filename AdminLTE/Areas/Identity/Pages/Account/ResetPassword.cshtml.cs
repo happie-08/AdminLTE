@@ -71,21 +71,22 @@ namespace AdminLTE.Areas.Identity.Pages.Account
 
         }
 
-        public IActionResult OnGet(string code = null)
+        public async Task<IActionResult> OnGetAsync(string code = null, string email = null)
         {
-            if (code == null)
+            if (code == null || email == null)
             {
-                return BadRequest("A code must be supplied for password reset.");
+                return BadRequest("A code and email must be supplied for password reset.");
             }
-            else
+
+            Input = new InputModel
             {
-                Input = new InputModel
-                {
-                    Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
-                };
-                return Page();
-            }
+                Code = code,
+                Email = email
+            };
+
+            return Page();
         }
+
 
         public async Task<IActionResult> OnPostAsync()
         {
