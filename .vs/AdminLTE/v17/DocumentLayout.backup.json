@@ -3,24 +3,16 @@
   "WorkspaceRootPath": "D:\\Internship\\AdminLTE\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\views\\manageuser\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\views\\manageuser\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\areas\\identity\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\areas\\identity\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\controllers\\manageusercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\controllers\\manageusercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\areas\\identity\\pages\\account\\login.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\areas\\identity\\pages\\account\\login.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\areas\\identity\\pages\\account\\forgotpassword.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\areas\\identity\\pages\\account\\forgotpassword.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\views\\shared\\_myadminlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\views\\shared\\_myadminlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -46,67 +38,41 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Login.cshtml",
-              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "RelativeDocumentMoniker": "AdminLTE\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "RelativeToolTip": "AdminLTE\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "ViewState": "AgIAAGcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\ManageUser\\Index.cshtml",
+              "RelativeDocumentMoniker": "AdminLTE\\Views\\ManageUser\\Index.cshtml",
+              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\ManageUser\\Index.cshtml",
+              "RelativeToolTip": "AdminLTE\\Views\\ManageUser\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-06-20T06:19:58.166Z",
+              "WhenOpened": "2025-06-28T08:08:46.974Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ManageUserController.cs",
+              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Controllers\\ManageUserController.cs",
+              "RelativeDocumentMoniker": "AdminLTE\\Controllers\\ManageUserController.cs",
+              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Controllers\\ManageUserController.cs",
+              "RelativeToolTip": "AdminLTE\\Controllers\\ManageUserController.cs",
+              "ViewState": "AgIAAI0AAAAAAAAAAAAAAKgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-28T08:08:24.665Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Login.cshtml.cs",
-              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Areas\\Identity\\Pages\\Account\\Login.cshtml.cs",
-              "RelativeDocumentMoniker": "AdminLTE\\Areas\\Identity\\Pages\\Account\\Login.cshtml.cs",
-              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Areas\\Identity\\Pages\\Account\\Login.cshtml.cs",
-              "RelativeToolTip": "AdminLTE\\Areas\\Identity\\Pages\\Account\\Login.cshtml.cs",
-              "ViewState": "AgIAAHIAAAAA3MzMzMwMwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-20T06:19:50.508Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ForgotPassword.cshtml.cs",
-              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Areas\\Identity\\Pages\\Account\\ForgotPassword.cshtml.cs",
-              "RelativeDocumentMoniker": "AdminLTE\\Areas\\Identity\\Pages\\Account\\ForgotPassword.cshtml.cs",
-              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Areas\\Identity\\Pages\\Account\\ForgotPassword.cshtml.cs",
-              "RelativeToolTip": "AdminLTE\\Areas\\Identity\\Pages\\Account\\ForgotPassword.cshtml.cs",
-              "ViewState": "AgIAAD0AAAAA0MzMzMz8vwAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-20T06:19:41.778Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Program.cs",
-              "RelativeDocumentMoniker": "AdminLTE\\Program.cs",
-              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Program.cs",
-              "RelativeToolTip": "AdminLTE\\Program.cs",
-              "ViewState": "AgIAABMAAAAALzMzMzMLwD8AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-19T11:18:50.219Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Home\\Index.cshtml",
-              "RelativeDocumentMoniker": "AdminLTE\\Views\\Home\\Index.cshtml",
-              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Home\\Index.cshtml*",
-              "RelativeToolTip": "AdminLTE\\Views\\Home\\Index.cshtml*",
-              "ViewState": "AgIAALgAAAAAIGZmZmb2v9QAAAAAAAAAAAAAAA==",
+              "Title": "_MyAdminLayout.cshtml",
+              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Shared\\_MyAdminLayout.cshtml",
+              "RelativeDocumentMoniker": "AdminLTE\\Views\\Shared\\_MyAdminLayout.cshtml",
+              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Shared\\_MyAdminLayout.cshtml",
+              "RelativeToolTip": "AdminLTE\\Views\\Shared\\_MyAdminLayout.cshtml",
+              "ViewState": "AgIAAHEAAAAA/v///38ZwIEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-06-18T15:46:14.827Z",
+              "WhenOpened": "2025-06-27T15:33:06.384Z",
               "EditorCaption": ""
             }
           ]

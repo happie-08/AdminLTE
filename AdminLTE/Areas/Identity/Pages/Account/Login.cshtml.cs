@@ -14,16 +14,18 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using AdminLTE.Models;
 
 namespace AdminLTE.Areas.Identity.Pages.Account
 {
+    [AllowAnonymous] // ✅ Required
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager; // 👈 Add this
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager; // 👈 Add this
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<LoginModel> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager; // 👈 Assign here
@@ -94,12 +96,6 @@ namespace AdminLTE.Areas.Identity.Pages.Account
             Response.Headers["Pragma"] = "no-cache";
             Response.Headers["Expires"] = "0";
 
-            // ✅ Avoid redirect loop
-            if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Home"); // go to Home/Index
-            }
-
             ReturnUrl = returnUrl ?? Url.Content("~/Home/Index");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
@@ -123,6 +119,8 @@ namespace AdminLTE.Areas.Identity.Pages.Account
                     if (result.Succeeded)
                     {
                         HttpContext.Session.SetString("UserName", user.UserName);
+                        HttpContext.Session.SetString("UserImage", user.Image); // 🟡 'user.Image' must be the actual file name
+
                         _logger.LogInformation("User logged in.");
                         return LocalRedirect(returnUrl);
                     }

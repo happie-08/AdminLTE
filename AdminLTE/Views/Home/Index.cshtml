@@ -181,21 +181,53 @@
                         <i class="fas fa-th-large"></i>
                     </a>
                 </li>
-               
+
                 <!--Logout or Cahnge Password-->
                 <!-- User Account Dropdown Menu -->
+                <!-- Navbar user info -->
+                @inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
+
+                @{
+                    var userName = accessor.HttpContext?.Session.GetString("UserName") ?? "Guest";
+                    var userImage = accessor.HttpContext?.Session.GetString("UserImage") ?? "";
+                    var finalImagePath = string.IsNullOrEmpty(userImage)
+                    ? Url.Content("~/dist/img/user2-160x160.jpg") // default
+                    : Url.Content("~/uploads/" + userImage);      // uploaded
+                }
+
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="#">
-                        <i class="fas fa-user"></i>
-                        <span class="ml-1"></span>
+                        <img src="@finalImagePath" class="img-circle elevation-2" alt="User"
+                             style="width: 30px; height: 30px; object-fit: cover;" />
                     </a>
+
+                    <!-- Dropdown with full details -->
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-header">Welcome, @HttpContextAccessor.HttpContext.Session.GetString("UserName")</span>
                         <div class="dropdown-divider"></div>
+
+                        <div class="d-flex justify-content-center my-2">
+                            <img src="@finalImagePath"
+                                 alt="User Image"
+                                 class="img-circle elevation-2"
+                                 style="width: 60px; height: 60px; object-fit: cover;" />
+                        </div>
+
+                        <span class="dropdown-header text-center">
+                            <strong>@userName</strong>
+                        </span>
+
+                        <a href="~/Identity/Account/EditProfile" class="dropdown-item">
+                            <i class="fas fa-user-edit mr-2"></i> Edit Profile
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+
                         <a href="~/Identity/Account/Manage/ChangePassword" class="dropdown-item text-danger">
                             <i class="fas fa-key mr-2"></i> Change Password
                         </a>
+
                         <div class="dropdown-divider"></div>
+
                         <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
                             <button type="submit" class="dropdown-item">
                                 <i class="fas fa-sign-out-alt mr-2"></i> Logout
@@ -203,7 +235,6 @@
                         </form>
                     </div>
                 </li>
-
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -218,19 +249,24 @@
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Sidebar user panel (optional) -->
-                @inject IHttpContextAccessor HttpContextAccessor
+                @using Microsoft.AspNetCore.Identity
+                @using AdminLTE.Models
+                @inject UserManager<ApplicationUser> UserManager
+
                 @{
-                    var username = HttpContextAccessor.HttpContext?.Session.GetString("UserName") ?? "Guest";
+                    var user = await UserManager.GetUserAsync(User);
+                    var username = user?.UserName ?? "Guest";
+                    var image = string.IsNullOrEmpty(user?.Image) ? "default.png" : user.Image;
                 }
+
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
                     <div class="image">
-                        <img src="~/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image" style="width: 40px; height: 40px;">
+                        <img src="~/uploads/@image" class="img-circle elevation-2" alt="User Image" style="width: 40px; height: 40px; object-fit: cover;">
                     </div>
                     <div class="info ps-2">
                         <a href="#" class="d-block fw-bold text-white">Welcome, @username</a>
                     </div>
                 </div>
-
 
                 <!-- SidebarSearch Form -->
                 <div class="form-inline">
@@ -257,7 +293,14 @@
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
-                            @* <ul class="nav nav-treeview">
+                        </li>
+                        <li class="nav-item">
+                            <a href="/ManageUser" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>User</p>
+                            </a>
+                        </li>
+                        @* <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="./index.html" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
@@ -883,7 +926,7 @@
                 </nav>
                 <!-- /.sidebar-menu -->
             </div>
-        
+
             <!-- /.sidebar -->
         </aside>
 

@@ -1,0 +1,94 @@
+﻿@model AdminLTE.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Edit User";
+    Layout = "~/Views/Shared/_MyAdminLayout.cshtml";
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h2 class="font-weight-bold text-primary">Edit User</h2>
+            </div>
+            <div class="col-md-6 text-right">
+                <a href="/ManageUser" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Back to Manage Users
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h4 class="card-title">Edit User Details</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="form-group">
+                        <label asp-for="Image" class="control-label">Profile Image</label>
+                        <input asp-for="Image" type="file" class="form-control-file" accept="image/*" />
+                        @if (!string.IsNullOrEmpty(Model.Image) && Model.Image != "default.png")
+                        {
+                            <img src="@Url.Content("~/uploads/" + Model.Image)" alt="Current Image" style="width: 100px; height: 100px; object-fit: cover;" class="mt-2" />
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber" class="control-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="UserName" class="control-label"></label>
+                        <input asp-for="UserName" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Address" class="control-label"></label>
+                        <textarea asp-for="Address" class="form-control"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="DOB" class="control-label"></label>
+                        <input asp-for="DOB" class="form-control" type="date" />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Gender" class="control-label"></label>
+                        <select asp-for="Gender" class="form-control">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Hobby" class="control-label"></label>
+                        <input asp-for="Hobby" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a asp-action="Index" class="btn btn-secondary ml-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" /> <!-- Optional, can be removed if no client-side validation is needed -->
+}
