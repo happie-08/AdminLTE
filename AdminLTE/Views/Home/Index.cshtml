@@ -281,25 +281,32 @@
                 </div>
 
                 <!-- Sidebar Menu -->
+                @{
+                    var currentUrl = Context.Request.Path.ToString().ToLower();
+                    var isDashboard = currentUrl == "/" || currentUrl.Contains("/home/index");
+                    var isUser = currentUrl.Contains("/manageuser");
+                }
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- Add icons to the links using the .nav-icon class
-                             with font-awesome or any other icon font library -->
-                        <li class="nav-item menu-open">
-                            <a href="#" class="nav-link active">
+                    <ul class="nav nav-pills nav-sidebar flex-column"
+                        data-widget="treeview" role="menu" data-accordion="false">
+
+                        <!-- Dashboard -->
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "Home")" class="nav-link @(isDashboard ? "active" : "")">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    Dashboard
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
+                                <p>Dashboard</p>
                             </a>
                         </li>
+
+                        <!-- User -->
                         <li class="nav-item">
-                            <a href="/ManageUser" class="nav-link">
+                            <a href="@Url.Action("Index", "ManageUser")" class="nav-link @(isUser ? "active" : "")">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>User</p>
                             </a>
                         </li>
+                    </ul>
+                
                         @* <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="./index.html" class="nav-link active">

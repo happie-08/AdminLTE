@@ -1,11 +1,14 @@
 ﻿using AdminLTE.Data;
 using AdminLTE.Models;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 
 namespace AdminLTE.Controllers
 {
@@ -22,93 +25,81 @@ namespace AdminLTE.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        // ----------- INDEX -------------
+        // -------------------- INDEX --------------------
         public async Task<IActionResult> Index()
         {
             var users = await _context.Users.ToListAsync();
             return View(users);
         }
-
-        // ----------- CREATE (GET) -------------
+        // -------------------- Create (Get) --------------------
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
+        // -------------------- Create (Post) --------------------
 
-        // ----------- CREATE (POST) -------------
-        // ----------- CREATE (POST) -------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser model, IFormFile ImageFile)
         {
-            if (!ModelState.IsValid)
+            // 1. Read password from Request
+            var password = Request.Form["Password"];
+
+            // 2. Validate required fields
+            if (string.IsNullOrEmpty(password))
             {
-                // Debug: Log model state errors
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    Console.WriteLine(error.ErrorMessage);
-                }
+                ModelState.AddModelError("Password", "Password is required.");
                 return View(model);
             }
 
-            // Handle image upload (optional)
+            // 3. Process image upload
             if (ImageFile != null && ImageFile.Length > 0)
             {
                 var fileName = Guid.NewGuid() + Path.GetExtension(ImageFile.FileName);
                 var path = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", fileName);
 
-                // Debug: Check if directory exists
-                var uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                    Console.WriteLine("Created uploads directory: " + uploadsFolder);
-                }
-
-                // Save the file
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
                     await ImageFile.CopyToAsync(stream);
-                    Console.WriteLine("Image saved to: " + path);
                 }
-                model.Image = fileName; // Set the filename to the model
+
+                model.Image = fileName;
             }
             else
             {
-                model.Image = "default.png"; // Default image if none uploaded
-                Console.WriteLine("No image uploaded, using default: default.png");
+                model.Image = "default.png";
             }
 
-            // Create user with Identity
-            var result = await _userManager.CreateAsync(model, "DefaultPassword123!"); // Replace with secure password logic
+            // 4. Read Hobbies from form
+            var selectedHobbies = Request.Form["Input.Hobby"];
+            model.Hobby = string.Join(", ", selectedHobbies);
+
+            // 5. Create user with password
+            var result = await _userManager.CreateAsync(model, password);
             if (result.Succeeded)
             {
                 TempData["Success"] = "User created successfully!";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
 
             foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-                Console.WriteLine("Identity Error: " + error.Description);
-            }
+                ModelState.AddModelError("", error.Description);
+
             return View(model);
         }
 
-        // ----------- EDIT (GET) -------------
+        // -------------------- EDIT (GET) --------------------
+        [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
-            if (string.IsNullOrEmpty(id))
-                return NotFound();
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-                return NotFound();
-
-            return View(user);
+            return View(user); // ✅ Pass fresh user data (with updated Image)
         }
 
-        // ----------- EDIT (POST) -------------
+        // -------------------- EDIT (POST) --------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ApplicationUser updatedUser, IFormFile ImageFile)
@@ -117,7 +108,7 @@ namespace AdminLTE.Controllers
             if (user == null)
                 return NotFound();
 
-            // ✅ Handle image upload
+            // ✅ Image upload
             if (ImageFile != null && ImageFile.Length > 0)
             {
                 var fileName = Guid.NewGuid() + Path.GetExtension(ImageFile.FileName);
@@ -128,7 +119,7 @@ namespace AdminLTE.Controllers
                     await ImageFile.CopyToAsync(stream);
                 }
 
-                // Delete old image if not default
+                // Delete old image
                 if (!string.IsNullOrEmpty(user.Image) && user.Image != "default.png")
                 {
                     var oldPath = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", user.Image);
@@ -137,10 +128,9 @@ namespace AdminLTE.Controllers
                 }
 
                 user.Image = fileName;
-                HttpContext.Session.SetString("UserImage", fileName);
             }
 
-            // ✅ Update other fields (no validation)
+            // ✅ Update safe fields
             user.Name = updatedUser.Name;
             user.Email = updatedUser.Email;
             user.UserName = updatedUser.UserName;
@@ -148,10 +138,10 @@ namespace AdminLTE.Controllers
             user.Address = updatedUser.Address;
             user.DOB = updatedUser.DOB;
             user.Gender = updatedUser.Gender;
-            user.Hobby = updatedUser.Hobby;
 
-            // ✅ Also store session username
-            HttpContext.Session.SetString("UserName", user.UserName ?? "Guest");
+            // ✅ Update Hobby from checkbox list
+            var selectedHobbies = Request.Form["Input.Hobby"];
+            user.Hobby = string.Join(", ", selectedHobbies);
 
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
@@ -165,5 +155,37 @@ namespace AdminLTE.Controllers
 
             return View(updatedUser);
         }
+        //delete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            // Delete image if not default
+            if (!string.IsNullOrEmpty(user.Image) && user.Image != "default.png")
+            {
+                var path = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", user.Image);
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                TempData["Success"] = "User deleted successfully.";
+            }
+            else
+            {
+                TempData["Error"] = "Failed to delete user.";
+            }
+
+            return RedirectToAction("Index");
+        }
+
     }
 }
