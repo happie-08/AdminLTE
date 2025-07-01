@@ -1,0 +1,48 @@
+﻿@model (string PageTitle, List<(string Label, string? Url)> Breadcrumbs)
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">@Model.PageTitle</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    @for (int i = 0; i < Model.Breadcrumbs.Count; i++)
+                    {
+                        var crumb = Model.Breadcrumbs[i];
+                        bool isLast = i == Model.Breadcrumbs.Count - 1;
+
+                        <li class="breadcrumb-item @(isLast ? "active" : "")">
+                            @if (!isLast && !string.IsNullOrEmpty(crumb.Url))
+                            {
+                                <a href="@crumb.Url" class="text-secondary">@crumb.Label</a>
+                            }
+                            else
+                            {
+                                <span class="text-primary">@crumb.Label</span>
+                            }
+                        </li>
+                    }
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .breadcrumb a {
+        color: #6c757d; /* gray */
+        text-decoration: none;
+    }
+
+        .breadcrumb a:hover {
+            color: #343a40;
+            text-decoration: underline;
+        }
+
+    .breadcrumb-item.active span {
+        color: #007bff;
+        font-weight: 500;
+    }
+</style>

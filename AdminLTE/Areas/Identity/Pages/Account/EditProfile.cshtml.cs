@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -25,21 +26,29 @@ namespace AdminLTE.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; }
 
-        public string StatusMessage { get; set; }
-
         public class InputModel
         {
+            [Required(ErrorMessage = "Full Name is required")]
             public string Name { get; set; }
+            [Required(ErrorMessage = "Email is required")]
+            [EmailAddress(ErrorMessage = "Invalid email address")]
             public string Email { get; set; }
+            [RegularExpression(@"^[6-9]\d{9}$", ErrorMessage = "Enter a valid 10-digit Indian mobile number")]
             public string PhoneNumber { get; set; }
+            [Required(ErrorMessage = "Username is required")]
             public string UserName { get; set; }
             public string Address { get; set; }
             public string Hobby { get; set; }
             public string Gender { get; set; }
             public DateTime? DOB { get; set; }
             public IFormFile? ImageFile { get; set; }
-            public string ImagePath { get; set; }
+            public string? ImagePath { get; set; }
+            
+
         }
+        [TempData]
+        public string StatusMessage { get; set; } // ? Move here (outside InputModel)
+
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -73,7 +82,12 @@ namespace AdminLTE.Areas.Identity.Pages.Account
                 return RedirectToPage("/Account/Login");
             }
 
-            // ? Save image if uploaded
+            if (!ModelState.IsValid)
+            {
+                return Page(); // skip processing if any required field is missing
+            }
+
+            // Image upload (no required validation)
             if (Input.ImageFile != null)
             {
                 var uploadsFolder = Path.Combine("wwwroot/uploads");
@@ -92,10 +106,10 @@ namespace AdminLTE.Areas.Identity.Pages.Account
                 HttpContext.Session.SetString("UserImage", fileName);
             }
 
+            // Username/Email update checks...
             // ? Safe Email update
             if (user.Email != Input.Email)
             {
-                // Check if email is taken
                 var existingEmailUser = await _userManager.FindByEmailAsync(Input.Email);
                 if (existingEmailUser != null && existingEmailUser.Id != user.Id)
                 {
@@ -112,11 +126,9 @@ namespace AdminLTE.Areas.Identity.Pages.Account
                 }
             }
 
-
             // ? Safe Username update
             if (user.UserName != Input.UserName)
             {
-                // Check if username is taken
                 var existingUser = await _userManager.FindByNameAsync(Input.UserName);
                 if (existingUser != null && existingUser.Id != user.Id)
                 {
@@ -133,7 +145,7 @@ namespace AdminLTE.Areas.Identity.Pages.Account
                 }
             }
 
-            // ? Update remaining properties
+            // Final updates
             user.Name = Input.Name;
             user.PhoneNumber = Input.PhoneNumber;
             user.Address = Input.Address;
@@ -149,21 +161,19 @@ namespace AdminLTE.Areas.Identity.Pages.Account
                 await _userManager.UpdateSecurityStampAsync(user);
                 await _signInManager.RefreshSignInAsync(user);
 
-                // ? Update session again after all updates
                 HttpContext.Session.SetString("UserName", user.UserName);
                 if (!string.IsNullOrEmpty(user.Image))
                     HttpContext.Session.SetString("UserImage", user.Image);
 
                 StatusMessage = "? Profile updated successfully!";
-                return Page();
+                return RedirectToPage(); // IMPORTANT for TempData to survive
             }
 
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
-                Console.WriteLine("Error: " + error.Description); // for debugging
             }
-            
+
             return Page();
         }
 

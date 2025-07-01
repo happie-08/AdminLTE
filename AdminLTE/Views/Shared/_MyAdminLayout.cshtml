@@ -215,9 +215,13 @@
         </aside>
 
         <!-- Page Content -->
+        <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
+            @RenderSection("PageHeader", required: false)
             @RenderBody()
         </div>
+
+
 
         <!-- Footer -->
         <footer class="main-footer">

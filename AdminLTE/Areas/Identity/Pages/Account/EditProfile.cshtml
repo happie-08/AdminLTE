@@ -22,12 +22,13 @@
 
 <section class="content">
     <div class="container-fluid">
-        <div class="card mx-auto shadow rounded-4" style="max-width: 900px;">
+        <div class="card shadow rounded-4">
             <div class="card-header bg-primary text-white text-center rounded-top-4">
                 <h5 class="mb-0">Update Your Profile</h5>
             </div>
 
             <form method="post" enctype="multipart/form-data" class="p-4">
+                <div asp-validation-summary="All" class="text-danger mb-3 text-center"></div>
                 @if (!string.IsNullOrEmpty(Model.StatusMessage))
                 {
                     <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -36,6 +37,7 @@
                     </div>
                 }
 
+                <!-- Profile Image -->
                 <div class="text-center mb-4">
                     <div style="position: relative; display: inline-block;">
                         <img src="~/uploads/@Model.Input.ImagePath" class="rounded-circle border"
@@ -47,9 +49,10 @@
                     <span asp-validation-for="Input.ImageFile" class="text-danger"></span>
                 </div>
 
+                <!-- Personal Info -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Full Name</label>
+                        <label class="form-label">Full Name <span class="text-danger">*</span></label>
                         <input asp-for="Input.Name" class="form-control" placeholder="Enter full name" />
                         <span asp-validation-for="Input.Name" class="text-danger"></span>
                     </div>
@@ -59,51 +62,62 @@
                         <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">Email <span class="text-danger required-asterisk">*</span></label>
                         <input asp-for="Input.Email" class="form-control" placeholder="Enter email" />
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Username</label>
+                        <label class="form-label">Username <span class="text-danger required-asterisk">*</span></label>
                         <input asp-for="Input.UserName" class="form-control" placeholder="Enter username" />
                         <span asp-validation-for="Input.UserName" class="text-danger"></span>
                     </div>
-                    <div class="col-md-12 mb-3">
+                    <div class="col-12 mb-3">
                         <label class="form-label">Address</label>
                         <textarea asp-for="Input.Address" class="form-control" rows="2" placeholder="Enter address"></textarea>
                         <span asp-validation-for="Input.Address" class="text-danger"></span>
                     </div>
 
-                    <label class="form-label d-block">Hobby</label>
-                    @foreach (var hobby in new[] { "Gaming", "Dansing", "Coding", "Music", "Sports", "Travel", "Cooking", "Other"})
-                    {
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="Input.Hobby"
-                                   value="@hobby" @(Model.Input.Hobby?.Contains(hobby) == true ? "checked" : "") />
-                            <label class="form-check-label">@hobby</label>
-                        </div>
-                    }
-                    <span class="text-danger" asp-validation-for="Input.Hobby"></span>
-
+                    <!-- Date of Birth -->
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Date of Birth</label>
                         <input asp-for="Input.DOB" type="date" class="form-control" />
                         <span asp-validation-for="Input.DOB" class="text-danger"></span>
                     </div>
-                    <div>
+
+                    <!-- Gender -->
+                    <div class="col-md-6 mb-3">
                         <label class="form-label d-block">Gender</label>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" asp-for="Input.Gender" value="Male" checked="@("Male" == Model.Input.Gender)" />
+                            <input class="form-check-input" type="radio" asp-for="Input.Gender" value="Male"
+                                   checked="@(Model.Input.Gender == "Male")" />
                             <label class="form-check-label">Male</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" asp-for="Input.Gender" value="Female" checked="@("Female" == Model.Input.Gender)" />
+                            <input class="form-check-input" type="radio" asp-for="Input.Gender" value="Female"
+                                   checked="@(Model.Input.Gender == "Female")" />
                             <label class="form-check-label">Female</label>
                         </div>
                         <span asp-validation-for="Input.Gender" class="text-danger"></span>
                     </div>
+
+                    <!-- Hobby -->
+                    <div class="col-12 mb-3">
+                        <label class="form-label d-block">Hobbies</label>
+                        <div class="d-flex flex-wrap">
+                            @foreach (var hobby in new[] { "Gaming", "Dancing", "Coding", "Music", "Sports", "Travel", "Cooking", "Other" })
+                            {
+                                <div class="form-check form-check-inline me-4 mb-2">
+                                    <input class="form-check-input" type="checkbox" name="Input.Hobby"
+                                           value="@hobby" @(Model.Input.Hobby?.Contains(hobby) == true ? "checked" : "") />
+                                    <label class="form-check-label">@hobby</label>
+                                </div>
+                            }
+                        </div>
+                        <span class="text-danger" asp-validation-for="Input.Hobby"></span>
+                    </div>
                 </div>
 
+                <!-- Submit Button -->
                 <div class="text-center mt-4">
                     <button type="submit" class="btn btn-success px-4">Update Profile</button>
                 </div>
@@ -114,9 +128,21 @@
 
 @section Scripts {
     <script>
+        // Hide asterisk when typing
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function () {
+                const asterisk = this.closest('.mb-3')?.querySelector('.required-asterisk');
+                if (asterisk) {
+                    asterisk.style.display = this.value.trim() === '' ? 'inline' : 'none';
+                }
+            });
+        });
+
+        // Remove alert after 3 seconds
         setTimeout(function () {
             document.querySelector('.alert')?.remove();
         }, 3000);
     </script>
     <partial name="_ValidationScriptsPartial" />
 }
+

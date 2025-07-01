@@ -1,19 +1,33 @@
 ﻿@model AdminLTE.Models.ApplicationUser
 @{
-    ViewData["Title"] = "Edit Profile";
+    ViewData["Title"] = "Edit User";
     Layout = "~/Views/Shared/_MyAdminLayout.cshtml";
 }
+@{
+    var breadcrumbs = new List<(string Label, string? Url)>
+    {
+        ("Home", "/"),
+        ("Users List", "/ManageUser"),
+        ("Edit User", null)
+    };
+}
+
+@section PageHeader {
+    @await Html.PartialAsync("_PageHeader", (PageTitle: "Edit User", Breadcrumbs: breadcrumbs))
+}
+
 
 <section class="content">
     <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
+        <div class="row">
+            <div class="col-12">
                 <div class="card shadow border border-primary">
-                    <div class="card-header bg-primary text-white text-center">
-                        <h4 class="mb-0">Update Your Profile</h4>
-                    </div>
+                    @* <div class="card-header bg-primary text-white text-center">
+                        <h4 class="mb-0">Edit User</h4>
+                    </div> *@
                     <div class="card-body">
                         <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                            <div asp-validation-summary="All" class="text-danger mb-3"></div>
                             <input type="hidden" asp-for="Id" />
 
                             <!-- Profile Image -->
@@ -31,25 +45,30 @@
 
                             <!-- Full Name & Phone -->
                             <div class="form-row">
+                                <!-- Full Name -->
                                 <div class="form-group col-md-6">
-                                    <label><strong>Full Name</strong></label>
+                                    <label><strong>Full Name</strong> <span class="text-danger">*</span></label>
                                     <input asp-for="Name" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label><strong>Phone Number</strong></label>
+                                    <label><strong>PhoneNumber</strong></label>
                                     <input asp-for="PhoneNumber" class="form-control" />
                                 </div>
                             </div>
 
                             <!-- Email & Username -->
                             <div class="form-row">
+                                <!-- Email -->
                                 <div class="form-group col-md-6">
-                                    <label><strong>Email</strong></label>
+                                    <label><strong>Email</strong> <span class="text-danger">*</span></label>
                                     <input asp-for="Email" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label><strong>Username</strong></label>
+                                    <label><strong>Username</strong> <span class="text-danger">*</span></label>
                                     <input asp-for="UserName" class="form-control" />
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -84,7 +103,7 @@
                             <div class="form-group">
                                 <label><strong>Hobby</strong></label>
                                 @{
-                                    var allHobbies = new[] { "Gaming", "Dansing", "Coding", "Music", "Sports", "Travel", "Cooking", "Other" };
+                                    var allHobbies = new[] { "Gaming", "Dancing", "Coding", "Music", "Sports", "Travel", "Cooking", "Other" };
                                     var selectedHobbies = Model.Hobby?.Split(", ") ?? Array.Empty<string>();
                                 }
                                 <div class="d-flex flex-wrap">

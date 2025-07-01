@@ -28,15 +28,21 @@ namespace AdminLTE.Controllers
         // -------------------- INDEX --------------------
         public async Task<IActionResult> Index()
         {
-            var users = await _context.Users.ToListAsync();
+            var users = await _context.Users
+                .OrderByDescending(u => u.Id) // sort new records first
+                .ToListAsync();
+
             return View(users);
         }
+
         // -------------------- Create (Get) --------------------
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            var model = new ApplicationUser(); // ✅ Must not be null
+            return View(model);
         }
+
         // -------------------- Create (Post) --------------------
 
         [HttpPost]
@@ -45,12 +51,23 @@ namespace AdminLTE.Controllers
         {
             // 1. Read password from Request
             var password = Request.Form["Password"];
-
-            // 2. Validate required fields
-            if (string.IsNullOrEmpty(password))
+            if (string.IsNullOrWhiteSpace(model.Name) ||
+               string.IsNullOrWhiteSpace(model.UserName) ||
+               string.IsNullOrWhiteSpace(model.Email) ||
+               string.IsNullOrWhiteSpace(password))
             {
-                ModelState.AddModelError("Password", "Password is required.");
+                // Show general error
+                ViewBag.RequiredError = "Fields marked with * are required. Please fill them.";
                 return View(model);
+            }
+
+            if (!string.IsNullOrEmpty(model.PhoneNumber))
+            {
+                if (!System.Text.RegularExpressions.Regex.IsMatch(model.PhoneNumber, @"^\d{10}$"))
+                {
+                    ModelState.AddModelError("PhoneNumber", "Phone number must be exactly 10 digits.");
+                    return View(model); // Return early if phone is invalid
+                }
             }
 
             // 3. Process image upload

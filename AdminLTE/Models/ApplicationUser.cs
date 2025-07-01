@@ -8,6 +8,7 @@ namespace AdminLTE.Models
 {
     public class ApplicationUser:IdentityUser
     {
+        [Required(ErrorMessage = "Full Name is required")]
         public string? Name { get; set; }
         public string? Image { get; set; }
         public string? Address { get; set; }

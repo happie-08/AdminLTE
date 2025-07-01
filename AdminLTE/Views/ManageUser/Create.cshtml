@@ -1,19 +1,39 @@
 ﻿@model AdminLTE.Models.ApplicationUser
 @{
-    ViewData["Title"] = "Create New User";
+    ViewData["Title"] = "Add User";
     Layout = "~/Views/Shared/_MyAdminLayout.cshtml";
+}
+@{
+    var breadcrumbs = new List<(string Label, string? Url)>
+    {
+        ("Home", "/"),
+        ("Users List", "/ManageUser"),
+        ("Add User", null)
+    };
+}
+
+@section PageHeader {
+    @await Html.PartialAsync("_PageHeader", (PageTitle: "Add User", Breadcrumbs: breadcrumbs))
 }
 
 <section class="content">
     <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
+        <div class="row">
+            <div class="col-12">
                 <div class="card shadow border border-primary">
-                    <div class="card-header bg-primary text-white text-center">
+                    @* <div class="card-header bg-primary text-white text-center">
                         <h4 class="mb-0">Create New User</h4>
-                    </div>
+                    </div> *@
                     <div class="card-body">
+                        @if (ViewBag.RequiredError != null)
+                        {
+                            <div class="alert alert-danger">
+                                <strong>@ViewBag.RequiredError</strong>
+                            </div>
+                        }   
                         <form asp-action="Create" method="post" enctype="multipart/form-data">
+                            <!-- Show all validation messages at top -->
+                            <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                             <div class="text-center mb-4">
                                 <img src="~/uploads/default.png"
@@ -29,29 +49,34 @@
 
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    <label>Full Name</label>
+                                    <label>Full Name <span class="text-danger">*</span></label>
                                     <input asp-for="Name" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label>Phone Number</label>
-                                    <input asp-for="PhoneNumber" class="form-control" />
+                                    <label>PhoneNumber</label>
+                                    <input asp-for="PhoneNumber" class="form-control" pattern="\d{10}" title="Enter 10-digit phone number only" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    <label>Email</label>
-                                    <input asp-for="Email" class="form-control" />
+                                    <label>Email <span class="text-danger">*</span></label>
+                                    <input asp-for="Email" class="form-control" required />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label>Username</label>
-                                    <input asp-for="UserName" class="form-control" />
+                                    <label>Username <span class="text-danger">*</span></label>
+                                    <input asp-for="UserName" class="form-control" required />
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label>Password</label>
-                                <input name="Password" type="password" class="form-control" required />
+                                <label>Password <span class="text-danger">*</span></label>
+                                <input type="password" name="Password" class="form-control" required />
+                                <span class="text-danger">@ViewData["PasswordError"]</span>
                             </div>
 
                             <div class="form-group">
@@ -66,23 +91,24 @@
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Gender</label>
-                                    <div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" asp-for="Gender" value="Male" />
-                                            <label class="form-check-label">Male</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" asp-for="Gender" value="Female" />
-                                            <label class="form-check-label">Female</label>
-                                        </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" asp-for="Gender" value="Male"
+                                               checked="@(Model.Gender == null || Model.Gender == "Male")" />
+                                        <label class="form-check-label">Male</label>
                                     </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" asp-for="Gender" value="Female"
+                                               checked="@(Model.Gender == "Female")" />
+                                        <label class="form-check-label">Female</label>
+                                    </div>
+
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label>Hobby</label>
                                 @{
-                                    var allHobbies = new[] { "Gaming","Dansing","Coding", "Music", "Sports", "Travel", "Cooking","Other" };
+                                    var allHobbies = new[] { "Gaming", "Dancing", "Coding", "Music", "Sports", "Travel", "Cooking", "Other" };
                                 }
                                 <div>
                                     @foreach (var hobby in allHobbies)
@@ -108,3 +134,7 @@
         </div>
     </div>
 </section>
+
+
+
+
