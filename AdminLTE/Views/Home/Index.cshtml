@@ -281,11 +281,14 @@
                 </div>
 
                 <!-- Sidebar Menu -->
+                
                 @{
-                    var currentUrl = Context.Request.Path.ToString().ToLower();
-                    var isDashboard = currentUrl == "/" || currentUrl.Contains("/home/index");
-                    var isUser = currentUrl.Contains("/manageuser");
+                     var currentUrl = Context.Request.Path.ToString().ToLower();
+                     var isDashboard = currentUrl == "/" || currentUrl.Contains("/home/index");
+                     var isUser = currentUrl.Contains("/manageuser");
+                     var isRole = currentUrl.Contains("/mrole");
                 }
+
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column"
                         data-widget="treeview" role="menu" data-accordion="false">
@@ -305,7 +308,17 @@
                                 <p>User</p>
                             </a>
                         </li>
+
+                        <!-- Role -->
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "Role")" class="nav-link @(isRole ? "active" : "")">
+                                <i class="nav-icon fas fa-user-shield"></i>
+                                <p>Role</p>
+                            </a>
+                        </li>
+
                     </ul>
+
                 
                         @* <ul class="nav nav-treeview">
                                 <li class="nav-item">

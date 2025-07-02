@@ -1,0 +1,172 @@
+﻿@model IEnumerable<AdminLTE.Models.Role>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+    ViewData["Title"] = "Role List";
+    Layout = "~/Views/Shared/_MyAdminLayout.cshtml";
+    var index = 1;
+}
+
+@{
+    var breadcrumbs = new List<(string Label, string? Url)>
+    {
+        ("Home", "/"),
+        ("Role List", null)
+    };
+}
+
+@section PageHeader {
+    @await Html.PartialAsync("_PageHeader", (PageTitle: "Role List", Breadcrumbs: breadcrumbs))
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-outline card-primary">
+            <div class="card-body p-0">
+                <div class="table-responsive p-2">
+                    <table id="roleTable" class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var role in Model)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td>@role.Name</td>
+                                    <td>@role.Description</td>
+                                    <td class="text-center">
+                                        @Html.Raw(role.Active
+                                               ? "<i class='fas fa-check-circle text-success fa-lg'></i>"
+                                               : "<i class='fas fa-times-circle text-danger fa-lg'></i>")
+                                    </td>
+
+                                    <td>
+                                        <a asp-action="Edit" asp-route-id="@role.Id" class="btn btn-sm btn-primary text-white">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger text-white mt-1"
+                                                data-toggle="modal"
+                                                data-target="#deleteModal"
+                                                data-roleid="@role.Id"
+                                                data-rolename="@role.Name">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                                index++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="deleteForm" method="post">
+            @Html.AntiForgeryToken()
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete <strong id="deleteRoleName"></strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Hidden button for Add Role -->
+<div id="customAddButton" style="display: none;">
+    <a href="@Url.Action("Create", "Role")" class="btn btn-sm btn-primary ml-2">
+        <i class="fas fa-plus"></i> Add Role
+    </a>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" />
+
+    <script>
+        $(document).ready(function () {
+            var table = $('#roleTable').DataTable({
+                responsive: true,
+                autoWidth: false,
+                pageLength: 5,
+                lengthMenu: [5, 10, 25, 50],
+                ordering: false,
+                    order: [[1, 'asc']],
+                            columnDefs: [
+                        {
+                            targets: 0, // First column (Index)
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            targets: -1, // Last column (Actions)
+                            orderable: false
+                        }
+                    ],
+                drawCallback: function () {
+                    var api = this.api();
+                    api.column(0, { page: 'current' })
+                        .nodes()
+                        .each(function (cell, i) {
+                            cell.innerHTML = i + 1;
+                        });
+                },
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search roles...",
+                    lengthMenu: "Show _MENU_ roles",
+                    zeroRecords: "No matching roles found",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "No roles available",
+                    infoFiltered: "(filtered from _MAX_ total entries)"
+                }
+            });
+
+            // Append Add Role Button
+            $('#roleTable_filter').append($('#customAddButton').html());
+            $('#roleTable_filter').css({
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                gap: '10px'
+            });
+
+            $('#roleTable_filter input').css({ width: '250px' });
+
+            // Handle delete modal
+            $('body').on('click', 'button[data-target="#deleteModal"]', function () {
+                var roleId = $(this).data('roleid');
+                var roleName = $(this).data('rolename');
+                $('#deleteRoleName').text(roleName);
+                $('#deleteForm').attr('action', '/Role/DeleteConfirmed/' + roleId);
+            });
+        });
+
+    </script>
+}

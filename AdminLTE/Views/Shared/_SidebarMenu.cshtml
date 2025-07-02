@@ -236,6 +236,7 @@
             var currentPath = Context.Request.Path.ToString().ToLower();
             var isDashboardActive = currentPath == "/" || currentPath.Contains("/home/index");
             var isUserActive = currentPath.Contains("/manageuser");
+            var isRoleActive = currentPath.Contains("/role");
         }
 
         <nav class="mt-2">
@@ -256,6 +257,12 @@
                     <a href="~/ManageUser" class="nav-link @(isUserActive ? "active" : "")">
                         <i class="nav-icon fas fa-users-cog"></i>
                         <p>User</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="~/Role" class="nav-link @(isRoleActive ? "active" : "")">
+                        <i class="nav-icon fas fa-user-shield"></i>
+                        <p>Role</p>
                     </a>
                 </li>
 

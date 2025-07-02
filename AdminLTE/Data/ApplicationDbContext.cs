@@ -10,5 +10,7 @@ namespace AdminLTE.Data
             : base(options)
         {
         }
+        public DbSet<Role> Roles { get; set; }
+
     }
 }
