@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace AdminLTE.Models
@@ -15,6 +16,10 @@ namespace AdminLTE.Models
         public string? Hobby { get; set; }
         public DateTime? DOB { get; set; }
         public string? Gender { get; set; }
+        public int? RoleId { get; set; }
+
+        [ForeignKey("RoleId")]
+        public Role? Role { get; set; }
 
     }
 }

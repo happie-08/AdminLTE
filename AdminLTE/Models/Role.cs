@@ -14,5 +14,7 @@ namespace AdminLTE.Models
         public string? Description { get; set; }
 
         public bool Active { get; set; } = true;
+        public ICollection<ApplicationUser>? Users { get; set; }
+
     }
 }

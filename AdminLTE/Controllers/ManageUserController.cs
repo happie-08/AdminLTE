@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
@@ -29,8 +30,9 @@ namespace AdminLTE.Controllers
         public async Task<IActionResult> Index()
         {
             var users = await _context.Users
-                .OrderByDescending(u => u.Id) // sort new records first
-                .ToListAsync();
+             .Include(u => u.Role)
+             .OrderByDescending(u => u.Id)
+             .ToListAsync();
 
             return View(users);
         }
@@ -39,8 +41,8 @@ namespace AdminLTE.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var model = new ApplicationUser(); // ✅ Must not be null
-            return View(model);
+            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name");
+            return View(new ApplicationUser());
         }
 
         // -------------------- Create (Post) --------------------
@@ -92,6 +94,10 @@ namespace AdminLTE.Controllers
             var selectedHobbies = Request.Form["Input.Hobby"];
             model.Hobby = string.Join(", ", selectedHobbies);
 
+            model.RoleId = int.Parse(Request.Form["RoleId"]);
+            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name");
+            //ViewBag.RoleList = new SelectList(_context.Roles, "Id", "Name");
+
             // 5. Create user with password
             var result = await _userManager.CreateAsync(model, password);
             if (result.Succeeded)
@@ -111,6 +117,7 @@ namespace AdminLTE.Controllers
         public async Task<IActionResult> Edit(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
+            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name", user.RoleId);
             if (user == null) return NotFound();
 
             return View(user); // ✅ Pass fresh user data (with updated Image)
@@ -159,6 +166,10 @@ namespace AdminLTE.Controllers
             // ✅ Update Hobby from checkbox list
             var selectedHobbies = Request.Form["Input.Hobby"];
             user.Hobby = string.Join(", ", selectedHobbies);
+
+            user.RoleId = int.Parse(Request.Form["RoleId"]);
+            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name", user.RoleId);
+            //ViewBag.RoleList = new SelectList(_context.Roles, "Id", "Name");
 
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)

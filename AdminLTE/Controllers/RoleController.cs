@@ -110,6 +110,7 @@ namespace AdminLTE.Controllers
             return View(role);
         }
 
+        // In RoleController.cs
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -118,9 +119,19 @@ namespace AdminLTE.Controllers
             if (role == null)
                 return NotFound();
 
+            // Check if any users are using this role
+            bool isRoleInUse = _context.Users.Any(u => u.RoleId == id);
+            if (isRoleInUse)
+            {
+                TempData["Error"] = "❌ Cannot delete this role because it is assigned to one or more users.";
+                return RedirectToAction(nameof(Index));
+            }
+
             _context.Roles.Remove(role);
             await _context.SaveChangesAsync();
+            TempData["Success"] = "✅ Role deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
+
     }
 }
