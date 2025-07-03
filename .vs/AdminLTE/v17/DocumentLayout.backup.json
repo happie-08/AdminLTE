@@ -3,20 +3,28 @@
   "WorkspaceRootPath": "D:\\Internship\\AdminLTE\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\views\\manageuser\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\views\\manageuser\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\views\\shared\\_sidebarmenu.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\views\\shared\\_sidebarmenu.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\views\\shared\\_myadminlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\views\\shared\\_myadminlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\controllers\\rolecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\controllers\\rolecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\views\\manageuser\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\views\\manageuser\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\views\\manageuser\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\views\\manageuser\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|d:\\internship\\adminlte\\adminlte\\controllers\\manageusercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3D04CA4E-8503-4450-AB7C-94A16DF809DD}|AdminLTE\\AdminLTE.csproj|solutionrelative:adminlte\\controllers\\manageusercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -43,19 +51,71 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Edit.cshtml",
-              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\ManageUser\\Edit.cshtml",
-              "RelativeDocumentMoniker": "AdminLTE\\Views\\ManageUser\\Edit.cshtml",
-              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\ManageUser\\Edit.cshtml*",
-              "RelativeToolTip": "AdminLTE\\Views\\ManageUser\\Edit.cshtml*",
-              "ViewState": "AgIAAE0AAAAAMDMzMzMLwF8AAAAmAAAAAAAAAA==",
+              "Title": "_SidebarMenu.cshtml",
+              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Shared\\_SidebarMenu.cshtml",
+              "RelativeDocumentMoniker": "AdminLTE\\Views\\Shared\\_SidebarMenu.cshtml",
+              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Shared\\_SidebarMenu.cshtml*",
+              "RelativeToolTip": "AdminLTE\\Views\\Shared\\_SidebarMenu.cshtml*",
+              "ViewState": "AgIAAJ0AAAAA4f////8jwK0AAABXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-07-02T09:47:33.579Z",
+              "WhenOpened": "2025-07-03T07:06:50.033Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Program.cs",
+              "RelativeDocumentMoniker": "AdminLTE\\Program.cs",
+              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Program.cs",
+              "RelativeToolTip": "AdminLTE\\Program.cs",
+              "ViewState": "AgIAADgAAACAzMzMzMwqwEsAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-03T06:12:36.883Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "RoleController.cs",
+              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Controllers\\RoleController.cs",
+              "RelativeDocumentMoniker": "AdminLTE\\Controllers\\RoleController.cs",
+              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Controllers\\RoleController.cs",
+              "RelativeToolTip": "AdminLTE\\Controllers\\RoleController.cs",
+              "ViewState": "AgIAABEAAAAAZmZmZmY6wCsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-03T05:37:20.3Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "AdminLTE\\Views\\Home\\Index.cshtml",
+              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "AdminLTE\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAOMAAAAAyczMzMwwwPwAAABSAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-03T05:35:07.42Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "_MyAdminLayout.cshtml",
+              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Shared\\_MyAdminLayout.cshtml",
+              "RelativeDocumentMoniker": "AdminLTE\\Views\\Shared\\_MyAdminLayout.cshtml",
+              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\Shared\\_MyAdminLayout.cshtml*",
+              "RelativeToolTip": "AdminLTE\\Views\\Shared\\_MyAdminLayout.cshtml*",
+              "ViewState": "AgIAAJMAAAAAAAAAAAChvacAAABSAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-02T13:58:09.6Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "Create.cshtml",
               "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\ManageUser\\Create.cshtml",
               "RelativeDocumentMoniker": "AdminLTE\\Views\\ManageUser\\Create.cshtml",
@@ -63,34 +123,7 @@
               "RelativeToolTip": "AdminLTE\\Views\\ManageUser\\Create.cshtml",
               "ViewState": "AgIAACsAAABAZGZmZmYkwFEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-07-02T09:40:01.49Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ManageUserController.cs",
-              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Controllers\\ManageUserController.cs",
-              "RelativeDocumentMoniker": "AdminLTE\\Controllers\\ManageUserController.cs",
-              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Controllers\\ManageUserController.cs",
-              "RelativeToolTip": "AdminLTE\\Controllers\\ManageUserController.cs",
-              "ViewState": "AgIAAI0AAADA2MzMzMwowK8AAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-02T09:37:50.036Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\ManageUser\\Index.cshtml",
-              "RelativeDocumentMoniker": "AdminLTE\\Views\\ManageUser\\Index.cshtml",
-              "ToolTip": "D:\\Internship\\AdminLTE\\AdminLTE\\Views\\ManageUser\\Index.cshtml",
-              "RelativeToolTip": "AdminLTE\\Views\\ManageUser\\Index.cshtml",
-              "ViewState": "AgIAABIAAAAAeGZmZmYEwEIAAABKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-07-02T09:15:33.85Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-02T09:40:01.49Z"
             }
           ]
         }

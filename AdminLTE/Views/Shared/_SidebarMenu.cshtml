@@ -129,11 +129,12 @@
         </li>
 
         <!-- Messages Dropdown Menu -->
-        <li class="nav-item dropdown">
+         <li class="nav-item dropdown">
             <a class="nav-link d-flex align-items-center"
                data-toggle="dropdown" style="cursor: pointer;">
                 <img src="~/dist/img/user1-128x128.jpg" alt="User Avatar" class="img-size-50 mr-3 img-circle" />
-            </a>
+            </a> 
+        </li>
 
             @using Microsoft.AspNetCore.Identity
             @using AdminLTE.Models
@@ -147,14 +148,13 @@
             }
 
         <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">
                 <img src="@finalImagePath" class="img-circle elevation-2"
                      alt="User" style="width: 30px; height: 30px; object-fit: cover;" />
             </a>
 
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <div class="dropdown-divider"></div>
-
                 <div class="d-flex justify-content-center my-2">
                     <img src="@finalImagePath" alt="User Image"
                          class="img-circle elevation-2"
@@ -171,14 +171,14 @@
 
                 <div class="dropdown-divider"></div>
 
-                <a href="~/Identity/Account/Manage/ChangePassword" class="dropdown-item text-danger">
+                <a href="~/Identity/Account/Manage/ChangePassword" class="dropdown-item">
                     <i class="fas fa-key mr-2"></i> Change Password
                 </a>
 
                 <div class="dropdown-divider"></div>
 
                 <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
-                    <button type="submit" class="dropdown-item">
+                    <button type="submit" class="dropdown-item text-danger">
                         <i class="fas fa-sign-out-alt mr-2"></i> Logout
                     </button>
                 </form>
@@ -232,11 +232,26 @@
         </div>
 
         <!-- Sidebar Menu -->
+        @using Microsoft.AspNetCore.Identity
+        @using AdminLTE.Models
+        @inject UserManager<ApplicationUser> UserManager
+
         @{
             var currentPath = Context.Request.Path.ToString().ToLower();
             var isDashboardActive = currentPath == "/" || currentPath.Contains("/home/index");
             var isUserActive = currentPath.Contains("/manageuser");
             var isRoleActive = currentPath.Contains("/role");
+
+            var currentUser = await UserManager.GetUserAsync(User); // renamed here
+            var roleName = "Guest";
+            var isAdmin = false;
+
+            if (currentUser != null)
+            {
+                var db = Context.RequestServices.GetService(typeof(AdminLTE.Data.ApplicationDbContext)) as AdminLTE.Data.ApplicationDbContext;
+                roleName = db?.Roles.FirstOrDefault(r => r.Id == currentUser.RoleId)?.Name ?? "Guest";
+                isAdmin = roleName == "Admin";
+            }
         }
 
         <nav class="mt-2">
@@ -259,15 +274,20 @@
                         <p>User</p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="~/Role" class="nav-link @(isRoleActive ? "active" : "")">
-                        <i class="nav-icon fas fa-user-shield"></i>
-                        <p>Role</p>
-                    </a>
-                </li>
 
+                <!-- Role (Visible only to Admin) -->
+                @if (isAdmin)
+                {
+                    <li class="nav-item">
+                        <a href="~/Role" class="nav-link @(isRoleActive ? "active" : "")">
+                            <i class="nav-icon fas fa-user-shield"></i>
+                            <p>Role</p>
+                        </a>
+                    </li>
+                }
             </ul>
         </nav>
+
 
         <!-- /.sidebar-menu -->
     </div>

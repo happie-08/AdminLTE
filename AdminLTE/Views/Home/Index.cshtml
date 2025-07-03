@@ -41,7 +41,6 @@
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-
         <!-- Preloader -->
         <div class="preloader flex-column justify-content-center align-items-center">
             <img class="animation__shake" src="~/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
@@ -222,14 +221,14 @@
 
                         <div class="dropdown-divider"></div>
 
-                        <a href="~/Identity/Account/Manage/ChangePassword" class="dropdown-item text-danger">
+                        <a href="~/Identity/Account/Manage/ChangePassword" class="dropdown-item ">
                             <i class="fas fa-key mr-2"></i> Change Password
                         </a>
 
                         <div class="dropdown-divider"></div>
 
                         <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
-                            <button type="submit" class="dropdown-item">
+                            <button type="submit" class="dropdown-item text-danger">
                                 <i class="fas fa-sign-out-alt mr-2"></i> Logout
                             </button>
                         </form>
@@ -281,46 +280,61 @@
                 </div>
 
                 <!-- Sidebar Menu -->
-                
+                @using Microsoft.AspNetCore.Identity
+                @using AdminLTE.Models
+                @inject UserManager<ApplicationUser> UserManager
+
                 @{
-                     var currentUrl = Context.Request.Path.ToString().ToLower();
-                     var isDashboard = currentUrl == "/" || currentUrl.Contains("/home/index");
-                     var isUser = currentUrl.Contains("/manageuser");
-                     var isRole = currentUrl.Contains("/mrole");
+                    var currentUrl = Context.Request.Path.ToString().ToLower();
+                    var isDashboard = currentUrl == "/" || currentUrl.Contains("/home/index");
+                    var isUser = currentUrl.Contains("/manageuser");
+                    var isRole = currentUrl.Contains("/role");
+
+                    // Reuse existing 'user' variable
+                    var roleName = "Guest";
+                    var isAdmin = false;
+
+                    if (user != null)
+                    {
+                        var db = Context.RequestServices.GetService(typeof(AdminLTE.Data.ApplicationDbContext)) as AdminLTE.Data.ApplicationDbContext;
+                        roleName = db?.Roles.FirstOrDefault(r => r.Id == user.RoleId)?.Name ?? "Guest";
+                        isAdmin = roleName == "Admin";
+                    }
                 }
 
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column"
-                        data-widget="treeview" role="menu" data-accordion="false">
+                < class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column"
+                    data-widget="treeview" role="menu" data-accordion="false">
 
-                        <!-- Dashboard -->
-                        <li class="nav-item">
-                            <a href="@Url.Action("Index", "Home")" class="nav-link @(isDashboard ? "active" : "")">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>Dashboard</p>
-                            </a>
-                        </li>
+                    <!-- Dashboard -->
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "Home")" class="nav-link @(isDashboard ? "active" : "")">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
 
-                        <!-- User -->
-                        <li class="nav-item">
-                            <a href="@Url.Action("Index", "ManageUser")" class="nav-link @(isUser ? "active" : "")">
-                                <i class="nav-icon fas fa-users"></i>
-                                <p>User</p>
-                            </a>
-                        </li>
+                    <!-- User -->
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "ManageUser")" class="nav-link @(isUser ? "active" : "")">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>User</p>
+                        </a>
+                    </li>
 
-                        <!-- Role -->
+                    <!-- Role (Admin only) -->
+                    @if (isAdmin)
+                    {
                         <li class="nav-item">
                             <a href="@Url.Action("Index", "Role")" class="nav-link @(isRole ? "active" : "")">
                                 <i class="nav-icon fas fa-user-shield"></i>
                                 <p>Role</p>
                             </a>
                         </li>
+                    }
+                </ul>
 
-                    </ul>
-
-                
-                        @* <ul class="nav nav-treeview">
+                @* <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="./index.html" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>

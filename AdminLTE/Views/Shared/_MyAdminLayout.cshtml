@@ -34,6 +34,11 @@
     @{
         DisableCache();
     }
+    <style>
+        .dropdown-toggle::after {
+            display: none !important;
+        }
+    </style>
 
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -129,10 +134,11 @@
                 }
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
-                        <img src="@finalImagePath" class="img-circle elevation-2"
-                             alt="User" style="width: 30px; height: 30px; object-fit: cover;" />
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+                        <img src="@finalImagePath" class="img-circle elevation-2" alt="User"
+                             style="width: 30px; height: 30px; object-fit: cover;" />
                     </a>
+
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                         <div class="dropdown-divider"></div>
 
@@ -152,14 +158,14 @@
 
                         <div class="dropdown-divider"></div>
 
-                        <a href="~/Identity/Account/Manage/ChangePassword" class="dropdown-item text-danger">
+                        <a href="~/Identity/Account/Manage/ChangePassword" class="dropdown-item ">
                             <i class="fas fa-key mr-2"></i> Change Password
                         </a>
 
                         <div class="dropdown-divider"></div>
 
                         <form asp-area="Identity" asp-page="/Account/Logout" method="post" id="logoutForm">
-                            <button type="submit" class="dropdown-item">
+                            <button type="submit" class="dropdown-item text-danger">
                                 <i class="fas fa-sign-out-alt mr-2"></i> Logout
                             </button>
                         </form>
@@ -221,8 +227,6 @@
             @RenderBody()
         </div>
 
-
-
         <!-- Footer -->
         <footer class="main-footer">
             <strong>Copyright © 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
@@ -235,12 +239,16 @@
         <aside class="control-sidebar control-sidebar-dark"></aside>
     </div>
 
-    <!-- Scripts -->
+        
+    <!-- jQuery (MUST come first) -->
     <script src="~/plugins/jquery/jquery.min.js"></script>
-    <script src="~/plugins/jquery-ui/jquery-ui.min.js"></script>
+
+    <!-- Bootstrap JS (must be bundle version for dropdowns) -->
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    @* <script src="~/plugins/jquery-ui/jquery-ui.min.js"></script>
     <script>
         $.widget.bridge('uibutton', $.ui.button);
-    </script>
+    </script> *@
     <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/plugins/chart.js/Chart.min.js"></script>
     <script src="~/plugins/jqvmap/jquery.vmap.min.js"></script>

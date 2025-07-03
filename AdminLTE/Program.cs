@@ -26,7 +26,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Identity/Account/Login";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.AccessDeniedPath = "/Home/Index";
 });
 
 
@@ -69,15 +69,15 @@ app.UseSession(); // ? Enable session
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapGet("/", context =>
-{
-    context.Response.Redirect("/Identity/Account/Login");
-    return Task.CompletedTask;
-});
+//app.MapGet("/", context =>
+//{
+//    context.Response.Redirect("/Identity/Account/Login");
+//    return Task.CompletedTask;
+//});
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}").RequireAuthorization();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 

@@ -1,5 +1,7 @@
 ﻿using AdminLTE.Data;
 using AdminLTE.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -7,27 +9,44 @@ using System.Threading.Tasks;
 
 namespace AdminLTE.Controllers
 {
+    [Authorize]
     public class RoleController : Controller
     {
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public RoleController(ApplicationDbContext context)
+        public RoleController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
+            _userManager = userManager;
             _context = context;
         }
 
-        // GET: /Role
         public async Task<IActionResult> Index()
         {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
+
+            var role = await _context.Roles.FindAsync(user.RoleId);
+
+            if (role?.Name != "Admin")
+            {
+                TempData["AccessDenied"] = "❌ Access Denied: Only Admin can access this section.";
+                return RedirectToAction("Index", "Home");
+            }
+
             var roles = await _context.Roles.ToListAsync();
             return View(roles);
         }
 
-        // ==================== CREATE =======================
+        // ================= CREATE =================
         public IActionResult Create()
         {
             ViewBag.IsEdit = false;
-            return View("Create", new Role()); // same Create.cshtml used for both
+            return View("Create", new Role());
         }
 
         [HttpPost]
@@ -53,7 +72,7 @@ namespace AdminLTE.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ==================== EDIT =========================
+        // ================= EDIT =================
         public async Task<IActionResult> Edit(int id)
         {
             var role = await _context.Roles.FindAsync(id);
@@ -61,7 +80,7 @@ namespace AdminLTE.Controllers
                 return NotFound();
 
             ViewBag.IsEdit = true;
-            return View("Create", role); // same Create.cshtml reused
+            return View("Create", role);
         }
 
         [HttpPost]
@@ -100,7 +119,7 @@ namespace AdminLTE.Controllers
             }
         }
 
-        // ==================== DELETE =======================
+        // ================= DELETE =================
         public async Task<IActionResult> Delete(int id)
         {
             var role = await _context.Roles.FindAsync(id);
@@ -110,7 +129,6 @@ namespace AdminLTE.Controllers
             return View(role);
         }
 
-        // In RoleController.cs
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -119,7 +137,6 @@ namespace AdminLTE.Controllers
             if (role == null)
                 return NotFound();
 
-            // Check if any users are using this role
             bool isRoleInUse = _context.Users.Any(u => u.RoleId == id);
             if (isRoleInUse)
             {
@@ -132,6 +149,5 @@ namespace AdminLTE.Controllers
             TempData["Success"] = "✅ Role deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
-
     }
 }
