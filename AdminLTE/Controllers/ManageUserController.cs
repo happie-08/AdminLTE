@@ -1,4 +1,5 @@
 ﻿using AdminLTE.Data;
+using AdminLTE.Helpers;
 using AdminLTE.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -6,8 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,29 +16,28 @@ namespace AdminLTE.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _env;
 
-        public ManageUserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment hostingEnvironment)
+        public ManageUserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment env)
         {
             _context = context;
             _userManager = userManager;
-            _hostingEnvironment = hostingEnvironment;
+            _env = env;
         }
 
-        //  Get API (for DataTable)
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
             var users = await _context.Users
                 .Include(u => u.Role)
-                .OrderByDescending(u => u.Id) 
+                .OrderByDescending(u => u.Id)
                 .Select(u => new
                 {
                     u.Id,
                     u.Name,
                     u.Email,
                     u.PhoneNumber,
-                    u.UserName, 
+                    u.UserName,
                     u.Address,
                     DOB = u.DOB.HasValue ? u.DOB.Value.ToString("dd/MM/yyyy") : "-",
                     u.Gender,
@@ -69,12 +67,12 @@ namespace AdminLTE.Controllers
         public async Task<IActionResult> Create(ApplicationUser model, IFormFile ImageFile)
         {
             var password = Request.Form["Password"];
-            if (string.IsNullOrWhiteSpace(model.Name) ||
-               string.IsNullOrWhiteSpace(model.UserName) ||
-               string.IsNullOrWhiteSpace(model.Email) ||
-               string.IsNullOrWhiteSpace(password))
+
+            if (string.IsNullOrWhiteSpace(model.Name) || string.IsNullOrWhiteSpace(model.UserName) ||
+                string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(password))
             {
                 ViewBag.RequiredError = "Fields marked with * are required.";
+                ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name");
                 return View(model);
             }
 
@@ -82,29 +80,13 @@ namespace AdminLTE.Controllers
                 !System.Text.RegularExpressions.Regex.IsMatch(model.PhoneNumber, @"^\d{10}$"))
             {
                 ModelState.AddModelError("PhoneNumber", "Phone number must be exactly 10 digits.");
+                ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name");
                 return View(model);
             }
 
-            if (ImageFile != null && ImageFile.Length > 0)
-            {
-                var fileName = Guid.NewGuid() + Path.GetExtension(ImageFile.FileName);
-                var path = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", fileName);
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await ImageFile.CopyToAsync(stream);
-                }
-                model.Image = fileName;
-            }
-            else
-            {
-                model.Image = "default.png";
-            }
-
-            var selectedHobbies = Request.Form["Input.Hobby"];
-            model.Hobby = string.Join(", ", selectedHobbies);
+            model.Image = await ImageHelper.SaveImageAsync(ImageFile, _env);
+            model.Hobby = string.Join(", ", Request.Form["Input.Hobby"]);
             model.RoleId = int.Parse(Request.Form["RoleId"]);
-
-            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name");
 
             var result = await _userManager.CreateAsync(model, password);
             if (result.Succeeded)
@@ -116,6 +98,7 @@ namespace AdminLTE.Controllers
             foreach (var error in result.Errors)
                 ModelState.AddModelError("", error.Description);
 
+            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name");
             return View(model);
         }
 
@@ -138,21 +121,11 @@ namespace AdminLTE.Controllers
 
             if (ImageFile != null && ImageFile.Length > 0)
             {
-                var fileName = Guid.NewGuid() + Path.GetExtension(ImageFile.FileName);
-                var path = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", fileName);
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await ImageFile.CopyToAsync(stream);
-                }
+                // Delete old image
+                ImageHelper.DeleteImage(user.Image, _env);
 
-                if (!string.IsNullOrEmpty(user.Image) && user.Image != "default.png")
-                {
-                    var oldPath = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", user.Image);
-                    if (System.IO.File.Exists(oldPath))
-                        System.IO.File.Delete(oldPath);
-                }
-
-                user.Image = fileName;
+                // Save new image
+                user.Image = await ImageHelper.SaveImageAsync(ImageFile, _env);
             }
 
             user.Name = updatedUser.Name;
@@ -162,12 +135,8 @@ namespace AdminLTE.Controllers
             user.Address = updatedUser.Address;
             user.DOB = updatedUser.DOB;
             user.Gender = updatedUser.Gender;
-
-            var selectedHobbies = Request.Form["Input.Hobby"];
-            user.Hobby = string.Join(", ", selectedHobbies);
+            user.Hobby = string.Join(", ", Request.Form["Input.Hobby"]);
             user.RoleId = int.Parse(Request.Form["RoleId"]);
-
-            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name", user.RoleId);
 
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
@@ -179,6 +148,7 @@ namespace AdminLTE.Controllers
             foreach (var error in result.Errors)
                 ModelState.AddModelError("", error.Description);
 
+            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name", user.RoleId);
             return View(updatedUser);
         }
 
@@ -189,14 +159,9 @@ namespace AdminLTE.Controllers
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
 
-            if (!string.IsNullOrEmpty(user.Image) && user.Image != "default.png")
-            {
-                var path = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", user.Image);
-                if (System.IO.File.Exists(path))
-                    System.IO.File.Delete(path);
-            }
-
+            ImageHelper.DeleteImage(user.Image, _env);
             var result = await _userManager.DeleteAsync(user);
+
             if (result.Succeeded)
                 TempData["Success"] = "User deleted successfully.";
             else

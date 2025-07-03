@@ -1,4 +1,5 @@
 using AdminLTE.Models;
+using AdminLTE.Helpers; // ? Add this for ImageHelper
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -6,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace AdminLTE.Areas.Identity.Pages.Account
@@ -16,11 +16,13 @@ namespace AdminLTE.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IWebHostEnvironment _env;
 
-        public EditProfileModel(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public EditProfileModel(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IWebHostEnvironment env)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _env = env;
         }
 
         [BindProperty]
@@ -30,24 +32,27 @@ namespace AdminLTE.Areas.Identity.Pages.Account
         {
             [Required(ErrorMessage = "Full Name is required")]
             public string Name { get; set; }
+
             [Required(ErrorMessage = "Email is required")]
             [EmailAddress(ErrorMessage = "Invalid email address")]
             public string Email { get; set; }
+
             [RegularExpression(@"^[6-9]\d{9}$", ErrorMessage = "Enter a valid 10-digit Indian mobile number")]
             public string PhoneNumber { get; set; }
+
             [Required(ErrorMessage = "Username is required")]
             public string UserName { get; set; }
+
             public string Address { get; set; }
             public string Hobby { get; set; }
             public string Gender { get; set; }
             public DateTime? DOB { get; set; }
             public IFormFile? ImageFile { get; set; }
             public string? ImagePath { get; set; }
-            
-
         }
+
         [TempData]
-        public string StatusMessage { get; set; } // ? Move here (outside InputModel)
+        public string StatusMessage { get; set; }
 
 
         public async Task<IActionResult> OnGetAsync()
@@ -84,68 +89,18 @@ namespace AdminLTE.Areas.Identity.Pages.Account
 
             if (!ModelState.IsValid)
             {
-                return Page(); // skip processing if any required field is missing
+                return Page();
             }
 
-            // Image upload (no required validation)
+            // ? Use ImageHelper to Save New Image (and delete old)
             if (Input.ImageFile != null)
             {
-                var uploadsFolder = Path.Combine("wwwroot/uploads");
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
-
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(Input.ImageFile.FileName);
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await Input.ImageFile.CopyToAsync(stream);
-                }
-
-                user.Image = fileName;
-                HttpContext.Session.SetString("UserImage", fileName);
+                ImageHelper.DeleteImage(user.Image, _env);
+                user.Image = await ImageHelper.SaveImageAsync(Input.ImageFile, _env);
+                HttpContext.Session.SetString("UserImage", user.Image);
             }
 
-            // Username/Email update checks...
-            // ? Safe Email update
-            if (user.Email != Input.Email)
-            {
-                var existingEmailUser = await _userManager.FindByEmailAsync(Input.Email);
-                if (existingEmailUser != null && existingEmailUser.Id != user.Id)
-                {
-                    ModelState.AddModelError("Input.Email", $"The email '{Input.Email}' is already in use.");
-                    return Page();
-                }
-
-                var emailResult = await _userManager.SetEmailAsync(user, Input.Email);
-                if (!emailResult.Succeeded)
-                {
-                    foreach (var error in emailResult.Errors)
-                        ModelState.AddModelError("Input.Email", error.Description);
-                    return Page();
-                }
-            }
-
-            // ? Safe Username update
-            if (user.UserName != Input.UserName)
-            {
-                var existingUser = await _userManager.FindByNameAsync(Input.UserName);
-                if (existingUser != null && existingUser.Id != user.Id)
-                {
-                    ModelState.AddModelError("Input.UserName", $"The username '{Input.UserName}' is already taken.");
-                    return Page();
-                }
-
-                var usernameResult = await _userManager.SetUserNameAsync(user, Input.UserName);
-                if (!usernameResult.Succeeded)
-                {
-                    foreach (var error in usernameResult.Errors)
-                        ModelState.AddModelError("Input.UserName", error.Description);
-                    return Page();
-                }
-            }
-
-            // Final updates
+            // ? Update other fields
             user.Name = Input.Name;
             user.PhoneNumber = Input.PhoneNumber;
             user.Address = Input.Address;
@@ -155,6 +110,42 @@ namespace AdminLTE.Areas.Identity.Pages.Account
             var selectedHobbies = Request.Form["Input.Hobby"];
             user.Hobby = string.Join(", ", selectedHobbies);
 
+            // ? Update Email if changed
+            if (user.Email != Input.Email)
+            {
+                var emailExists = await _userManager.FindByEmailAsync(Input.Email);
+                if (emailExists != null && emailExists.Id != user.Id)
+                {
+                    ModelState.AddModelError("Input.Email", $"The email '{Input.Email}' is already in use.");
+                    return Page();
+                }
+                var emailResult = await _userManager.SetEmailAsync(user, Input.Email);
+                if (!emailResult.Succeeded)
+                {
+                    foreach (var error in emailResult.Errors)
+                        ModelState.AddModelError("Input.Email", error.Description);
+                    return Page();
+                }
+            }
+
+            // ? Update Username if changed
+            if (user.UserName != Input.UserName)
+            {
+                var usernameExists = await _userManager.FindByNameAsync(Input.UserName);
+                if (usernameExists != null && usernameExists.Id != user.Id)
+                {
+                    ModelState.AddModelError("Input.UserName", $"The username '{Input.UserName}' is already taken.");
+                    return Page();
+                }
+                var usernameResult = await _userManager.SetUserNameAsync(user, Input.UserName);
+                if (!usernameResult.Succeeded)
+                {
+                    foreach (var error in usernameResult.Errors)
+                        ModelState.AddModelError("Input.UserName", error.Description);
+                    return Page();
+                }
+            }
+
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
@@ -162,20 +153,15 @@ namespace AdminLTE.Areas.Identity.Pages.Account
                 await _signInManager.RefreshSignInAsync(user);
 
                 HttpContext.Session.SetString("UserName", user.UserName);
-                if (!string.IsNullOrEmpty(user.Image))
-                    HttpContext.Session.SetString("UserImage", user.Image);
 
                 StatusMessage = "? Profile updated successfully!";
-                return RedirectToPage(); // IMPORTANT for TempData to survive
+                return RedirectToPage();
             }
 
             foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
+                ModelState.AddModelError("", error.Description);
 
             return Page();
         }
-
     }
 }
