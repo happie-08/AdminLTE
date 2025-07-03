@@ -31,6 +31,12 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 
 builder.Services.AddControllersWithViews(); // ? Allow anonymous by default
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Prevent automatic camelCasing of property names
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 
 builder.Services.AddRazorPages();
 

@@ -1,5 +1,4 @@
-﻿@model IEnumerable<AdminLTE.Models.ApplicationUser>
-@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 
 @{
     ViewData["Title"] = "Users List";
@@ -10,14 +9,13 @@
     var breadcrumbs = new List<(string Label, string? Url)>
     {
         ("Home", "/"),
-        (" Users List", null) // last item (active, no URL)
+        (" Users List", null)
     };
 }
 
 @section PageHeader {
     @await Html.PartialAsync("_PageHeader", (PageTitle: "Users List", Breadcrumbs: breadcrumbs))
 }
-
 
 <!-- Main Content -->
 <section class="content">
@@ -28,7 +26,7 @@
                     <table id="userTable" class="table table-bordered table-hover">
                         <thead class="thead-dark">
                             <tr>
-                                <th>#</th> <!-- hidden index -->
+                                <th>#</th>
                                 <th>Profile</th>
                                 <th>Email / Phone</th>
                                 <th>Username</th>
@@ -39,56 +37,7 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @if (Model != null && Model.Any())
-                            {
-                                foreach (var user in Model)
-                                {
-                                    <tr>
-                                        <td></td>
-                                        <td>
-                                            <img src="@Url.Content("~/uploads/" + (string.IsNullOrEmpty(user.Image) ? "default.png" : user.Image))"
-                                                 class="img-circle elevation-2"
-                                                 style="width: 40px; height: 40px; object-fit: cover;" />
-                                            <div class="font-weight-bold">@user.Name</div>
-                                            @* <small class="text-muted">ID: @user.Id</small> *@
-                                        </td>
-                                        <td>
-                                            <strong>@(user.Email ?? "-")</strong><br />
-                                            <span class="text-muted">@user.PhoneNumber</span>
-                                        </td>
-                                        <td>@(user.UserName ?? "-")</td>
-                                        <td style="display:none">@(user.Address ?? "-")</td>
-                                        <td>
-                                            @(user.DOB?.ToString("dd/MM/yyyy") ?? "-")<br />
-                                            @user.Gender
-                                        </td>
-                                        <td>@(user.Hobby ?? "-")</td>
-                                        <td>@(user.Role?.Name ?? "-")</td>
-                                        <td>
-                                            <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-info text-white">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </a>
-                                            <button type="button"
-                                                    class="btn btn-sm btn-danger text-white mt-1"
-                                                    data-toggle="modal"
-                                                    data-target="#deleteModal"
-                                                    data-userid="@user.Id"
-                                                    data-username="@user.UserName">
-                                                <i class="fas fa-trash-alt"></i> Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    index++;
-                                }
-                            }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="8" class="text-center text-danger">No users found.</td>
-                                </tr>
-                            }
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -141,18 +90,68 @@
     <script>
         $(document).ready(function () {
             var table = $('#userTable').DataTable({
+                ajax: {
+                    url: '/ManageUser/GetUsers',
+                    type: 'GET',
+                    datatype: 'json'
+                },
+                columns: [
+                    {
+                            data: null,
+                            render: function (data, type, row, meta) {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            }
+                    },
+            
+                    {
+                        data: 'Image',
+                        render: function (data, type, row) {
+                            return `
+                                <img src="/uploads/${data}" class="img-circle elevation-2" style="width:40px; height:40px; object-fit:cover;" />
+                                <div class="font-weight-bold">${row.Name}</div>`;
+                        }
+                    },
+                    {
+                        data: 'Email',
+                        render: function (data, type, row) {
+                            return `<strong>${data ?? '-'}</strong><br/><span class="text-muted">${row.PhoneNumber ?? '-'}</span>`;
+                        }
+                    },
+                    { data: 'UserName' }, // ✅ PascalCase matches API
+                    { data: 'Address', visible: false },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `${row.DOB}<br/>${row.Gender}`;
+                        }
+                    },
+                    { data: 'Hobby' },
+                    { data: 'RoleName' },
+                    {
+                        data: 'Id',
+                        render: function (data, type, row) {
+                            return `
+                                <a href="/ManageUser/Edit/${data}" class="btn btn-sm btn-info text-white">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger text-white mt-1"
+                                    data-toggle="modal" data-target="#deleteModal"
+                                    data-userid="${data}" data-username="${row.UserName}">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>`;
+                        }
+                    }
+                ],
+                columnDefs: [
+                    { orderable: false, targets: 0 } // 🚫 Disable sorting for "#" column
+                ],
                 responsive: true,
                 autoWidth: false,
                 pageLength: 5,
                 lengthMenu: [5, 10, 25, 50],
-                lengthChange: true,
-                ordering: true,
-                order: [[1, 'asc']], // Sort by Profile column
-                columnDefs: [
-                    { targets: 0, orderable: false },  // Index column
-                    { targets: -1, orderable: false }  // Action column
-                ],
+                order: [[0, 'desc']],
                 language: {
+                    emptyTable: "🚫 No users found. Click <a href='/ManageUser/Create'>Add User</a>.",
                     search: "_INPUT_",
                     searchPlaceholder: "Search users...",
                     lengthMenu: "Show _MENU_ users",
@@ -163,17 +162,7 @@
                 }
             });
 
-            // ✅ Set dynamic index in "#" column
-            table.on('order.dt search.dt draw.dt', function () {
-                let pageInfo = table.page.info();
-                table.column(0, { search: 'applied', order: 'applied', page: 'current' })
-                    .nodes()
-                    .each(function (cell, i) {
-                        cell.innerHTML = i + 1 + pageInfo.start;
-                    });
-            }).draw();
-
-            // ✅ Append "Add User" button to search bar
+            // Append Add User Button
             $('#userTable_filter').append($('#customAddButton').html());
             $('#userTable_filter').css({
                 display: 'flex',
@@ -184,7 +173,7 @@
 
             $('#userTable_filter input').css({ width: '250px' });
 
-            // ✅ Delete modal setup
+            // Delete Modal
             $('#userTable').on('click', 'button[data-toggle="modal"]', function () {
                 var userId = $(this).data('userid');
                 var userName = $(this).data('username');
@@ -193,5 +182,4 @@
             });
         });
     </script>
-
 }

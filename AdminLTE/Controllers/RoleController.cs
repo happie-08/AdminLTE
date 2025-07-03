@@ -20,6 +20,24 @@ namespace AdminLTE.Controllers
             _userManager = userManager;
             _context = context;
         }
+        [HttpGet]
+        public async Task<IActionResult> GetRoles()
+        {
+            var roles = await _context.Roles
+            .Select(r => new
+            {
+                id = r.Id,               // 👈 lowercase
+                name = r.Name,
+                description = r.Description,
+                active = r.Active
+                    ? "<i class='fas fa-check-circle text-success fa-lg'></i>"
+                    : "<i class='fas fa-times-circle text-danger fa-lg'></i>"
+            })
+            .ToListAsync();
+
+            return Json(new { data = roles });
+
+        }
 
         public async Task<IActionResult> Index()
         {
@@ -38,8 +56,7 @@ namespace AdminLTE.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var roles = await _context.Roles.ToListAsync();
-            return View(roles);
+            return View(); // 👈 Don't pass roles, we are loading them via API
         }
 
         // ================= CREATE =================

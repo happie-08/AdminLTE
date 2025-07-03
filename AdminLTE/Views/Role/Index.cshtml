@@ -34,35 +34,7 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach (var role in Model)
-                            {
-                                <tr>
-                                    <td></td>
-                                    <td>@role.Name</td>
-                                    <td>@role.Description</td>
-                                    <td class="text-center">
-                                        @Html.Raw(role.Active
-                                               ? "<i class='fas fa-check-circle text-success fa-lg'></i>"
-                                               : "<i class='fas fa-times-circle text-danger fa-lg'></i>")
-                                    </td>
-
-                                    <td>
-                                        <a asp-action="Edit" asp-route-id="@role.Id" class="btn btn-sm btn-primary text-white">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </a>
-                                        <button type="button"
-                                                class="btn btn-sm btn-danger text-white mt-1"
-                                                data-toggle="modal"
-                                                data-target="#deleteModal"
-                                                data-roleid="@role.Id"
-                                                data-rolename="@role.Name">
-                                            <i class="fas fa-trash-alt"></i> Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                                index++;
-                            }
+                        <tbody >
                         </tbody>
                     </table>
                 </div>
@@ -112,32 +84,40 @@
     <script>
         $(document).ready(function () {
             var table = $('#roleTable').DataTable({
+                ajax: {
+                    url: '/Role/GetRoles',
+                    type: 'GET',
+                    datatype: 'json'
+                },
+                columns: [
+                    { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                    { data: 'name' },
+                    { data: 'description' },
+                    { data: 'active', className: 'text-center' },
+                    {
+                        data: 'id',
+                        render: function (data, type, row) {
+                            return `
+                                <a href="/Role/Edit/${data}" class="btn btn-sm btn-primary text-white">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-danger text-white mt-1"
+                                        data-toggle="modal"
+                                        data-target="#deleteModal"
+                                        data-roleid="${data}"
+                                        data-rolename="${row.name}">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>`;
+                        }
+                    }
+                ],
                 responsive: true,
                 autoWidth: false,
                 pageLength: 5,
                 lengthMenu: [5, 10, 25, 50],
-                ordering: false,
-                    order: [[1, 'asc']],
-                            columnDefs: [
-                        {
-                            targets: 0, // First column (Index)
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            targets: -1, // Last column (Actions)
-                            orderable: false
-                        }
-                    ],
-                drawCallback: function () {
-                    var api = this.api();
-                    api.column(0, { page: 'current' })
-                        .nodes()
-                        .each(function (cell, i) {
-                            cell.innerHTML = i + 1;
-                        });
-                },
                 language: {
+                    emptyTable: "🚫 No roles found. Click <a href='/Role/Create'>Add Role</a>.",
                     search: "_INPUT_",
                     searchPlaceholder: "Search roles...",
                     lengthMenu: "Show _MENU_ roles",
@@ -145,10 +125,10 @@
                     info: "Showing _START_ to _END_ of _TOTAL_ entries",
                     infoEmpty: "No roles available",
                     infoFiltered: "(filtered from _MAX_ total entries)"
-                }
+                } // ✅ properly closed
             });
 
-            // Append Add Role Button
+            // ✅ Append Add Role Button
             $('#roleTable_filter').append($('#customAddButton').html());
             $('#roleTable_filter').css({
                 display: 'flex',
@@ -159,7 +139,7 @@
 
             $('#roleTable_filter input').css({ width: '250px' });
 
-            // Handle delete modal
+            // ✅ Handle delete modal
             $('body').on('click', 'button[data-target="#deleteModal"]', function () {
                 var roleId = $(this).data('roleid');
                 var roleName = $(this).data('rolename');
@@ -167,6 +147,6 @@
                 $('#deleteForm').attr('action', '/Role/DeleteConfirmed/' + roleId);
             });
         });
-
     </script>
+
 }

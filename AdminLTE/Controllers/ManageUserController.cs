@@ -26,18 +26,37 @@ namespace AdminLTE.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        // -------------------- INDEX --------------------
-        public async Task<IActionResult> Index()
+        //  Get API (for DataTable)
+        [HttpGet]
+        public async Task<IActionResult> GetUsers()
         {
             var users = await _context.Users
-             .Include(u => u.Role)
-             .OrderByDescending(u => u.Id)
-             .ToListAsync();
+                .Include(u => u.Role)
+                .OrderByDescending(u => u.Id) 
+                .Select(u => new
+                {
+                    u.Id,
+                    u.Name,
+                    u.Email,
+                    u.PhoneNumber,
+                    u.UserName, 
+                    u.Address,
+                    DOB = u.DOB.HasValue ? u.DOB.Value.ToString("dd/MM/yyyy") : "-",
+                    u.Gender,
+                    u.Hobby,
+                    RoleName = u.Role != null ? u.Role.Name : "-",
+                    Image = string.IsNullOrEmpty(u.Image) ? "default.png" : u.Image
+                })
+                .ToListAsync();
 
-            return View(users);
+            return Json(new { data = users });
         }
 
-        // -------------------- Create (Get) --------------------
+        public IActionResult Index()
+        {
+            return View();
+        }
+
         [HttpGet]
         public IActionResult Create()
         {
@@ -45,44 +64,35 @@ namespace AdminLTE.Controllers
             return View(new ApplicationUser());
         }
 
-        // -------------------- Create (Post) --------------------
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser model, IFormFile ImageFile)
         {
-            // 1. Read password from Request
             var password = Request.Form["Password"];
             if (string.IsNullOrWhiteSpace(model.Name) ||
                string.IsNullOrWhiteSpace(model.UserName) ||
                string.IsNullOrWhiteSpace(model.Email) ||
                string.IsNullOrWhiteSpace(password))
             {
-                // Show general error
-                ViewBag.RequiredError = "Fields marked with * are required. Please fill them.";
+                ViewBag.RequiredError = "Fields marked with * are required.";
                 return View(model);
             }
 
-            if (!string.IsNullOrEmpty(model.PhoneNumber))
+            if (!string.IsNullOrEmpty(model.PhoneNumber) &&
+                !System.Text.RegularExpressions.Regex.IsMatch(model.PhoneNumber, @"^\d{10}$"))
             {
-                if (!System.Text.RegularExpressions.Regex.IsMatch(model.PhoneNumber, @"^\d{10}$"))
-                {
-                    ModelState.AddModelError("PhoneNumber", "Phone number must be exactly 10 digits.");
-                    return View(model); // Return early if phone is invalid
-                }
+                ModelState.AddModelError("PhoneNumber", "Phone number must be exactly 10 digits.");
+                return View(model);
             }
 
-            // 3. Process image upload
             if (ImageFile != null && ImageFile.Length > 0)
             {
                 var fileName = Guid.NewGuid() + Path.GetExtension(ImageFile.FileName);
                 var path = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", fileName);
-
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
                     await ImageFile.CopyToAsync(stream);
                 }
-
                 model.Image = fileName;
             }
             else
@@ -90,15 +100,12 @@ namespace AdminLTE.Controllers
                 model.Image = "default.png";
             }
 
-            // 4. Read Hobbies from form
             var selectedHobbies = Request.Form["Input.Hobby"];
             model.Hobby = string.Join(", ", selectedHobbies);
-
             model.RoleId = int.Parse(Request.Form["RoleId"]);
-            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name");
-            //ViewBag.RoleList = new SelectList(_context.Roles, "Id", "Name");
 
-            // 5. Create user with password
+            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name");
+
             var result = await _userManager.CreateAsync(model, password);
             if (result.Succeeded)
             {
@@ -112,38 +119,32 @@ namespace AdminLTE.Controllers
             return View(model);
         }
 
-        // -------------------- EDIT (GET) --------------------
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name", user.RoleId);
             if (user == null) return NotFound();
 
-            return View(user); // ✅ Pass fresh user data (with updated Image)
+            ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name", user.RoleId);
+            return View(user);
         }
 
-        // -------------------- EDIT (POST) --------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ApplicationUser updatedUser, IFormFile ImageFile)
         {
             var user = await _userManager.FindByIdAsync(updatedUser.Id);
-            if (user == null)
-                return NotFound();
+            if (user == null) return NotFound();
 
-            // ✅ Image upload
             if (ImageFile != null && ImageFile.Length > 0)
             {
                 var fileName = Guid.NewGuid() + Path.GetExtension(ImageFile.FileName);
                 var path = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", fileName);
-
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
                     await ImageFile.CopyToAsync(stream);
                 }
 
-                // Delete old image
                 if (!string.IsNullOrEmpty(user.Image) && user.Image != "default.png")
                 {
                     var oldPath = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", user.Image);
@@ -154,7 +155,6 @@ namespace AdminLTE.Controllers
                 user.Image = fileName;
             }
 
-            // ✅ Update safe fields
             user.Name = updatedUser.Name;
             user.Email = updatedUser.Email;
             user.UserName = updatedUser.UserName;
@@ -163,13 +163,11 @@ namespace AdminLTE.Controllers
             user.DOB = updatedUser.DOB;
             user.Gender = updatedUser.Gender;
 
-            // ✅ Update Hobby from checkbox list
             var selectedHobbies = Request.Form["Input.Hobby"];
             user.Hobby = string.Join(", ", selectedHobbies);
-
             user.RoleId = int.Parse(Request.Form["RoleId"]);
+
             ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name", user.RoleId);
-            //ViewBag.RoleList = new SelectList(_context.Roles, "Id", "Name");
 
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
@@ -183,37 +181,28 @@ namespace AdminLTE.Controllers
 
             return View(updatedUser);
         }
-        //delete
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound();
+            if (user == null) return NotFound();
 
-            // Delete image if not default
             if (!string.IsNullOrEmpty(user.Image) && user.Image != "default.png")
             {
                 var path = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", user.Image);
                 if (System.IO.File.Exists(path))
-                {
                     System.IO.File.Delete(path);
-                }
             }
 
             var result = await _userManager.DeleteAsync(user);
             if (result.Succeeded)
-            {
                 TempData["Success"] = "User deleted successfully.";
-            }
             else
-            {
                 TempData["Error"] = "Failed to delete user.";
-            }
 
             return RedirectToAction("Index");
         }
-
     }
 }
