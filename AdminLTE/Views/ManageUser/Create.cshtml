@@ -1,19 +1,19 @@
 ﻿@model AdminLTE.Models.ApplicationUser
 @{
-    ViewData["Title"] = "Add User";
+    bool isEdit = ViewBag.IsEdit ?? false;
+    ViewData["Title"] = isEdit ? "Edit User" : "Add User";
     Layout = "~/Views/Shared/_MyAdminLayout.cshtml";
-}
-@{
+
     var breadcrumbs = new List<(string Label, string? Url)>
     {
         ("Home", "/"),
         ("Users List", "/ManageUser"),
-        ("Add User", null)
+        (isEdit ? "Edit User" : "Add User", null)
     };
 }
 
 @section PageHeader {
-    @await Html.PartialAsync("_PageHeader", (PageTitle: "Add User", Breadcrumbs: breadcrumbs))
+    @await Html.PartialAsync("_PageHeader", (PageTitle: ViewData["Title"].ToString(), Breadcrumbs: breadcrumbs))
 }
 
 <section class="content">
@@ -22,16 +22,23 @@
             <div class="col-12">
                 <div class="card shadow border border-primary">
                     <div class="card-body">
-                        @if (ViewBag.RequiredError != null)
+                        @if (!isEdit && ViewBag.RequiredError != null)
                         {
                             <div class="alert alert-danger">
                                 <strong>@ViewBag.RequiredError</strong>
                             </div>
-                        }   
-                        <form asp-action="Create" method="post" novalidate enctype="multipart/form-data">
-                           
+                        }
+
+                        <form asp-action="@(isEdit ? "Edit" : "Create")" method="post" enctype="multipart/form-data" novalidate>
+                            @if (isEdit)
+                            {
+                                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                                <input type="hidden" asp-for="Id" />
+                            }
+
+                            <!-- Profile Image -->
                             <div class="text-center mb-4">
-                                <img src="~/uploads/default.png"
+                                <img src="~/uploads/@(string.IsNullOrEmpty(Model.Image) ? "default.png" : Model.Image)"
                                      class="rounded-circle shadow"
                                      style="width: 120px; height: 120px; object-fit: cover;" />
                                 <div>
@@ -42,6 +49,7 @@
                                 </div>
                             </div>
 
+                            <!-- Full Name & Phone -->
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label>Full Name <span class="text-danger">*</span></label>
@@ -55,6 +63,7 @@
                                 </div>
                             </div>
 
+                            <!-- Email & Username -->
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label>Email <span class="text-danger">*</span></label>
@@ -67,40 +76,55 @@
                                     <span asp-validation-for="UserName" class="text-danger"></span>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-6 position-relative">
-                                    <label>Password <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input type="password" name="Password" class="form-control" id="passwordInput" required />
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                                <i class="fas fa-eye" id="toggleIcon"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <span class="text-danger">@ViewData["PasswordError"]</span>
-                                </div>
 
-                                <div class="form-group col-md-6">
-                                    <label asp-for="RoleId" class="font-weight-bold">Select Role <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">
-                                                <i class="fas fa-user-tag"></i>
-                                            </span>
+                            <!-- Password (Create Only) -->
+                            @if (!isEdit)
+                            {
+                                <div class="form-row">
+                                    <div class="form-group col-md-6 position-relative">
+                                        <label>Password <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" name="Password" class="form-control" id="passwordInput" required />
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                                    <i class="fas fa-eye" id="toggleIcon"></i>
+                                                </button>
+                                            </div>
                                         </div>
+                                        <span class="text-danger">@ViewData["PasswordError"]</span>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="RoleId" class="font-weight-bold">
+                                            <i class="fas fa-user-tag"></i> Select Role <span class="text-danger">*</span>
+                                        </label>
                                         <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleList">
                                             <option value="">-- Select Role --</option>
                                         </select>
+                                        <span asp-validation-for="RoleId" class="text-danger"></span>
                                     </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <!-- Role (Edit Only) -->
+                                <div class="form-group">
+                                    <label asp-for="RoleId" class="font-weight-bold">
+                                        <i class="fas fa-user-tag"></i> Select Role <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleList">
+                                        <option value="">-- Select Role --</option>
+                                    </select>
                                     <span asp-validation-for="RoleId" class="text-danger"></span>
                                 </div>
-                            </div>
+                            }
+
+                            <!-- Address -->
                             <div class="form-group">
                                 <label>Address</label>
-                                <textarea asp-for="Address" class="form-control"></textarea>
+                                <textarea asp-for="Address" class="form-control" rows="2"></textarea>
                             </div>
 
+                            <!-- DOB & Gender -->
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label>Date of Birth</label>
@@ -118,33 +142,37 @@
                                                checked="@(Model.Gender == "Female")" />
                                         <label class="form-check-label">Female</label>
                                     </div>
-
                                 </div>
                             </div>
 
+                            <!-- Hobby -->
                             <div class="form-group">
                                 <label>Hobby</label>
                                 @{
                                     var allHobbies = new[] { "Gaming", "Dancing", "Coding", "Music", "Sports", "Travel", "Cooking", "Other" };
+                                    var selectedHobbies = Model.Hobby?.Split(", ") ?? Array.Empty<string>();
                                 }
-                                <div>
+                                <div class="d-flex flex-wrap">
                                     @foreach (var hobby in allHobbies)
                                     {
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" name="Input.Hobby" value="@hobby" />
+                                        <div class="form-check form-check-inline mr-3 mb-2">
+                                            <input class="form-check-input" type="checkbox" name="Input.Hobby"
+                                                   value="@hobby"
+                                                   @(selectedHobbies.Contains(hobby) ? "checked" : "") />
                                             <label class="form-check-label">@hobby</label>
                                         </div>
                                     }
                                 </div>
                             </div>
-                           
 
-
-                            <div class="form-group text-center">
+                            <!-- Buttons -->
+                            <div class="form-group text-center mt-4">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i> Create User
+                                    <i class="fas @(isEdit ? "fa-save" : "fa-plus")"></i>
+                                    @(isEdit ? "Save Changes" : "Create User")
                                 </button>
-                                <a asp-action="Index" class="btn btn-secondary ml-2">Cancel</a>
+
+                                <a asp-action="Index" class="btn btn-secondary ml-2 px-4">Cancel</a>
                             </div>
                         </form>
                     </div>
@@ -153,7 +181,3 @@
         </div>
     </div>
 </section>
-
-
-
-

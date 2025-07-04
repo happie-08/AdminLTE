@@ -184,16 +184,17 @@
                 <!--Logout or Cahnge Password-->
                 <!-- User Account Dropdown Menu -->
                 <!-- Navbar user info -->
-                @inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
+                @using Microsoft.AspNetCore.Identity
+                @using AdminLTE.Models
+                @inject UserManager<ApplicationUser> UserManager
+                @inject SignInManager<ApplicationUser> SignInManager
 
                 @{
-                    var userName = accessor.HttpContext?.Session.GetString("UserName") ?? "Guest";
-                    var userImage = accessor.HttpContext?.Session.GetString("UserImage") ?? "";
-                    var finalImagePath = string.IsNullOrEmpty(userImage)
-                    ? Url.Content("~/dist/img/user2-160x160.jpg") // default
-                    : Url.Content("~/uploads/" + userImage);      // uploaded
+                    var currentUser = await UserManager.GetUserAsync(User);
+                    var userName = currentUser?.UserName ?? "Guest";
+                    var userImage = string.IsNullOrEmpty(currentUser?.Image) ? "default.png" : currentUser.Image;
+                    var finalImagePath = Url.Content("~/uploads/" + userImage);
                 }
-
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="#">
                         <img src="@finalImagePath" class="img-circle elevation-2" alt="User"
@@ -215,13 +216,13 @@
                             <strong>@userName</strong>
                         </span>
 
-                        <a href="~/Identity/Account/EditProfile" class="dropdown-item">
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="dropdown-item">
                             <i class="fas fa-user-edit mr-2"></i> Edit Profile
                         </a>
 
                         <div class="dropdown-divider"></div>
 
-                        <a href="~/Identity/Account/Manage/ChangePassword" class="dropdown-item ">
+                        <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="dropdown-item">
                             <i class="fas fa-key mr-2"></i> Change Password
                         </a>
 

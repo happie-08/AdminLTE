@@ -58,6 +58,7 @@ namespace AdminLTE.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.IsEdit = false;
             ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name");
             return View(new ApplicationUser());
         }
@@ -108,8 +109,9 @@ namespace AdminLTE.Controllers
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
 
+            ViewBag.IsEdit = true;
             ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name", user.RoleId);
-            return View(user);
+            return View("Create",user);
         }
 
         [HttpPost]
@@ -149,7 +151,7 @@ namespace AdminLTE.Controllers
                 ModelState.AddModelError("", error.Description);
 
             ViewBag.RoleList = new SelectList(_context.Roles.Where(r => r.Active), "Id", "Name", user.RoleId);
-            return View(updatedUser);
+            return View("Create",updatedUser);
         }
 
         [HttpPost]
