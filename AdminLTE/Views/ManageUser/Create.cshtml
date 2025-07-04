@@ -97,7 +97,7 @@
                                         <label asp-for="RoleId" class="font-weight-bold">
                                             <i class="fas fa-user-tag"></i> Select Role <span class="text-danger">*</span>
                                         </label>
-                                        <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleList">
+                                        <select asp-for="RoleId" class="form-control" id="roleDropdown">
                                             <option value="">-- Select Role --</option>
                                         </select>
                                         <span asp-validation-for="RoleId" class="text-danger"></span>
@@ -111,7 +111,7 @@
                                     <label asp-for="RoleId" class="font-weight-bold">
                                         <i class="fas fa-user-tag"></i> Select Role <span class="text-danger">*</span>
                                     </label>
-                                    <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleList">
+                                    <select asp-for="RoleId" class="form-control" id="roleDropdown">
                                         <option value="">-- Select Role --</option>
                                     </select>
                                     <span asp-validation-for="RoleId" class="text-danger"></span>
@@ -181,3 +181,38 @@
         </div>
     </div>
 </section>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Load roles into dropdown
+            $.get('/Role/GetRoles', function (result) {
+                console.log(result); // 👈 Debug: See if API returns data
+                var roleDropdown = $('#roleDropdown');
+                roleDropdown.empty();
+                roleDropdown.append('<option value="">-- Select Role --</option>');
+
+                // Loop through data.data because API wraps response
+                $.each(result.data, function (index, role) {
+                    roleDropdown.append('<option value="' + role.id + '">' + role.name + '</option>');
+                });
+
+                // Pre-select role if editing
+                var selectedRoleId = '@Model.RoleId';
+                if (selectedRoleId) {
+                    roleDropdown.val(selectedRoleId);
+                }
+            });
+
+            // Toggle Password visibility
+            $('#togglePassword').click(function () {
+                const passwordInput = $('#passwordInput');
+                const icon = $('#toggleIcon');
+                const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+                passwordInput.attr('type', type);
+                icon.toggleClass('fa-eye fa-eye-slash');
+            });
+        });
+    </script>
+}
+

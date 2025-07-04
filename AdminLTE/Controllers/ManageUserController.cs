@@ -49,7 +49,6 @@ namespace AdminLTE.Controllers
 
             return Json(new { data = users });
         }
-
         public IActionResult Index()
         {
             return View();
