@@ -1,169 +1,94 @@
-﻿using AdminLTE.Data;
-using AdminLTE.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using AdminLTE.Models;
+using AdminLTE.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdminLTE.Controllers
 {
-    [Authorize]
     public class RoleController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ApplicationDbContext _context;
+        private readonly IRoleRepository _roleRepository;
 
-        public RoleController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public RoleController(IRoleRepository roleRepository)
         {
-            _userManager = userManager;
-            _context = context;
+            _roleRepository = roleRepository;
         }
         [HttpGet]
         public async Task<IActionResult> GetRoles()
         {
-            var roles = await _context.Roles
-            .Select(r => new
-            {
-                id = r.Id,               // 👈 lowercase
-                name = r.Name,
-                description = r.Description,
-                active = r.Active
-                    ? "<i class='fas fa-check-circle text-success fa-lg'></i>"
-                    : "<i class='fas fa-times-circle text-danger fa-lg'></i>"
-            })
-            .ToListAsync();
+            var roles = (await _roleRepository.GetAllAsync())
+                .Select(r => new
+                {
+                    id = r.Id,
+                    name = r.Name,
+                    description = r.Description,
+                    active = r.Active
+                        ? "<i class='fas fa-check-circle text-success fa-lg'></i>"
+                        : "<i class='fas fa-times-circle text-danger fa-lg'></i>"
+                });
 
             return Json(new { data = roles });
-
         }
 
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-            {
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
-
-            var role = await _context.Roles.FindAsync(user.RoleId);
-
-            if (role?.Name != "Admin")
-            {
-                TempData["AccessDenied"] = "❌ Access Denied: Only Admin can access this section.";
-                return RedirectToAction("Index", "Home");
-            }
-
-            return View(); // 👈 Don't pass roles, we are loading them via API
+            return View(await _roleRepository.GetAllAsync());
         }
 
-        // ================= CREATE =================
         public IActionResult Create()
         {
             ViewBag.IsEdit = false;
-            return View("Create", new Role());
+            return View("Create",new Role());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Role model)
+        public async Task<IActionResult> Create(Role role)
         {
-            ViewBag.IsEdit = false;
-
             if (!ModelState.IsValid)
-                return View("Create", model);
+                return View("create",role);
 
-            bool exists = await _context.Roles
-                .AnyAsync(r => r.Name.ToLower() == model.Name.ToLower());
+            await _roleRepository.AddAsync(role);
+            await _roleRepository.SaveAsync();
 
-            if (exists)
-            {
-                ModelState.AddModelError("Name", "Role name already exists.");
-                return View("Create", model);
-            }
-
-            _context.Add(model);
-            await _context.SaveChangesAsync();
+            TempData["Success"] = "Role created successfully!";
             return RedirectToAction(nameof(Index));
         }
 
-        // ================= EDIT =================
         public async Task<IActionResult> Edit(int id)
         {
-            var role = await _context.Roles.FindAsync(id);
-            if (role == null)
-                return NotFound();
+            var role = await _roleRepository.GetByIdAsync(id);
+            if (role == null) return NotFound();
 
             ViewBag.IsEdit = true;
-            return View("Create", role);
+            return View("Create",role);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Role role)
+        public async Task<IActionResult> Edit(Role role)
         {
-            ViewBag.IsEdit = true;
-
-            if (id != role.Id)
-                return NotFound();
-
             if (!ModelState.IsValid)
-                return View("Create", role);
+                return View("Create",role);
 
-            bool duplicate = _context.Roles
-                .Any(r => r.Name.ToLower() == role.Name.ToLower() && r.Id != id);
+            await _roleRepository.UpdateAsync(role);
+            await _roleRepository.SaveAsync();
 
-            if (duplicate)
-            {
-                ModelState.AddModelError("Name", "Another role with the same name already exists.");
-                return View("Create", role);
-            }
-
-            try
-            {
-                _context.Update(role);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Roles.Any(r => r.Id == role.Id))
-                    return NotFound();
-                else
-                    throw;
-            }
-        }
-
-        // ================= DELETE =================
-        public async Task<IActionResult> Delete(int id)
-        {
-            var role = await _context.Roles.FindAsync(id);
-            if (role == null)
-                return NotFound();
-
-            return View(role);
+            TempData["Success"] = "Role updated successfully!";
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var role = await _context.Roles.FindAsync(id);
-            if (role == null)
-                return NotFound();
+            var role = await _roleRepository.GetByIdAsync(id);
+            if (role == null) return NotFound();
 
-            bool isRoleInUse = _context.Users.Any(u => u.RoleId == id);
-            if (isRoleInUse)
-            {
-                TempData["Error"] = "❌ Cannot delete this role because it is assigned to one or more users.";
-                return RedirectToAction(nameof(Index));
-            }
+            await _roleRepository.DeleteAsync(role);
+            await _roleRepository.SaveAsync();
 
-            _context.Roles.Remove(role);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "✅ Role deleted successfully.";
+            TempData["Success"] = "Role deleted successfully!";
             return RedirectToAction(nameof(Index));
         }
     }

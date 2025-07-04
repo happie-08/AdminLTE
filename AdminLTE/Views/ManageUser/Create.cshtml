@@ -30,6 +30,7 @@
                         }
 
                         <form asp-action="@(isEdit ? "Edit" : "Create")" method="post" enctype="multipart/form-data" novalidate>
+                            <input type="hidden" asp-for="Id" /> <!-- ✅ Always send Id -->
                             @if (isEdit)
                             {
                                 <div asp-validation-summary="All" class="text-danger mb-3"></div>
@@ -150,15 +151,15 @@
                                 <label>Hobby</label>
                                 @{
                                     var allHobbies = new[] { "Gaming", "Dancing", "Coding", "Music", "Sports", "Travel", "Cooking", "Other" };
-                                    var selectedHobbies = Model.Hobby?.Split(", ") ?? Array.Empty<string>();
+                                    var selectedHobbies = Model.Hobby?.Split(new[] { ",", ", " }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
                                 }
                                 <div class="d-flex flex-wrap">
                                     @foreach (var hobby in allHobbies)
                                     {
                                         <div class="form-check form-check-inline mr-3 mb-2">
-                                            <input class="form-check-input" type="checkbox" name="Input.Hobby"
+                                            <input class="form-check-input" type="checkbox" name="Hobby"
                                                    value="@hobby"
-                                                   @(selectedHobbies.Contains(hobby) ? "checked" : "") />
+                                                   @(selectedHobbies.Any(h => h.Equals(hobby, StringComparison.OrdinalIgnoreCase)) ? "checked" : "") />
                                             <label class="form-check-label">@hobby</label>
                                         </div>
                                     }
